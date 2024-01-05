@@ -15,6 +15,7 @@ func New(cloudID, apiKey string) (*Elastic, error) {
 	cfg := elasticsearch.Config{
 		CloudID:       cloudID,
 		APIKey:        apiKey,
+		Addresses:     []string{"http://localhost:9200"},
 		RetryOnStatus: []int{429, 502, 503, 504},
 		RetryBackoff: func(attempt int) time.Duration {
 			d := time.Duration(math.Exp2(float64(attempt))) * time.Second

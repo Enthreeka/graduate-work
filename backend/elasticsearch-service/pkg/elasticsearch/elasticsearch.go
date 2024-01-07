@@ -8,7 +8,7 @@ import (
 )
 
 type Elastic struct {
-	Elastic *elasticsearch.Client
+	*elasticsearch.Client
 }
 
 func New(cloudID, apiKey string) (*Elastic, error) {
@@ -27,7 +27,7 @@ func New(cloudID, apiKey string) (*Elastic, error) {
 	client, err := elasticsearch.NewClient(cfg)
 
 	e := &Elastic{
-		Elastic: client,
+		client,
 	}
 
 	return e, err

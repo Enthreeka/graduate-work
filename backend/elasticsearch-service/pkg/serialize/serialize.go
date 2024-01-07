@@ -1,6 +1,8 @@
 package serialize
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 func Unmarshal[T any](src string) (T, error) {
 	var args T

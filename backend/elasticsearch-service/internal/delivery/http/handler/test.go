@@ -21,3 +21,7 @@ func NewTestHandler(es *elasticsearch.Elastic, log *logger.Logger) *testHandler 
 func (t *testHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 }
+
+func (t *testHandler) Get(w http.ResponseWriter, r *http.Request) {
+
+}

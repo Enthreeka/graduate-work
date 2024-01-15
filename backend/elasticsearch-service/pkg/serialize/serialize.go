@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 )
 
-func Unmarshal[T any](src string) (T, error) {
+func Unmarshal[T any](src []byte) (T, error) {
 	var args T
 
-	if err := json.Unmarshal([]byte(src), &args); err != nil {
+	if err := json.Unmarshal(src, &args); err != nil {
 		return *(new(T)), err
 	}
 

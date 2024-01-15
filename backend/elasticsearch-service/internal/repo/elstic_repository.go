@@ -5,19 +5,19 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/Enthreeka/elasticsearch-service/internal/entity"
 	client "github.com/Enthreeka/elasticsearch-service/pkg/elasticsearch"
 	"github.com/Enthreeka/elasticsearch-service/pkg/logger"
 	"github.com/Enthreeka/elasticsearch-service/pkg/serialize"
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 	"strconv"
-	"strings"
 )
 
 type Elastic interface {
-	Index(ctx context.Context, data entity.Test) error
-	Search() (*entity.Test, error)
+	Index(ctx context.Context, data *entity.Test) error
+	IndexWithBulk(ctx context.Context, data []*entity.Test) error
+	QueryByDocumentID(ctx context.Context, documentID int) error
+	SearchIndex(ctx context.Context) (*entity.SearchResponse, error)
 }
 
 type elasticRepo struct {
@@ -32,7 +32,7 @@ func NewElasticRepo(elasticsearch *client.Elastic, log *logger.Logger) *elasticR
 	}
 }
 
-func (e *elasticRepo) Index(ctx context.Context, data entity.Test) error {
+func (e *elasticRepo) Index(ctx context.Context, data *entity.Test) error {
 	buf, err := serialize.Marshal(data)
 	if err != nil {
 		return errors.New("вывести ошибки при сериализации данных")
@@ -60,7 +60,7 @@ func (e *elasticRepo) Index(ctx context.Context, data entity.Test) error {
 }
 
 // https://youtu.be/j0RiWwef8Z8?t=2582
-func (e *elasticRepo) IndexWithBulk(ctx context.Context, data []entity.Test) error {
+func (e *elasticRepo) IndexWithBulk(ctx context.Context, data []*entity.Test) error {
 	bulkIndexer, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
 		Client:     e.Elastic.Client,
 		Index:      "index",
@@ -126,7 +126,7 @@ func (e *elasticRepo) QueryByDocumentID(ctx context.Context, documentID int) err
 	return nil
 }
 
-func (e *elasticRepo) SearchIndex(ctx context.Context) error {
+func (e *elasticRepo) SearchIndex(ctx context.Context) (*entity.SearchResponse, error) {
 	var searchBuffer bytes.Buffer
 	search := map[string]interface{}{
 		"query": map[string]interface{}{
@@ -138,7 +138,7 @@ func (e *elasticRepo) SearchIndex(ctx context.Context) error {
 
 	err := json.NewEncoder(&searchBuffer).Encode(search)
 	if err != nil {
-		return errors.New("вывести ошибку о сериализации")
+		return nil, errors.New("вывести ошибку о сериализации")
 	}
 
 	response, err := e.Elastic.Search(
@@ -151,10 +151,10 @@ func (e *elasticRepo) SearchIndex(ctx context.Context) error {
 
 	defer response.Body.Close()
 
-	searchResponse := entity.SearchResponse{}
+	searchResponse := &entity.SearchResponse{}
 	err = json.NewDecoder(response.Body).Decode(&searchResponse) // Replace
 	if err != nil {
-		return errors.New("вывести ошибку о сериализации")
+		return nil, errors.New("вывести ошибку о сериализации")
 	}
 
 	if searchResponse.Hits.Total.Value > 0 {
@@ -162,13 +162,8 @@ func (e *elasticRepo) SearchIndex(ctx context.Context) error {
 		for _, testTitle := range searchResponse.Hits.Hits {
 			testTitles = append(testTitles, testTitle.Source.Title)
 		}
-
-		fmt.Printf(strings.Join(testTitles, ","))
+		//fmt.Printf(strings.Join(testTitles, ","))
 	}
 
-	return nil
-}
-
-func (e *elasticRepo) Search() (*entity.Test, error) {
-	return nil, nil
+	return searchResponse, nil
 }

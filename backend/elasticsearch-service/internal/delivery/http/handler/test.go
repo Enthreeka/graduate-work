@@ -1,20 +1,21 @@
 package handler
 
 import (
-	"github.com/Enthreeka/elasticsearch-service/pkg/elasticsearch"
+	"github.com/Enthreeka/elasticsearch-service/internal/service"
 	"github.com/Enthreeka/elasticsearch-service/pkg/logger"
 	"net/http"
 )
 
 type testHandler struct {
-	es *elasticsearch.Elastic
+	elasticService service.ElasticUsecase
 
 	log *logger.Logger
 }
 
-func NewTestHandler(es *elasticsearch.Elastic, log *logger.Logger) *testHandler {
+func NewTestHandler(elasticService service.ElasticUsecase, log *logger.Logger) *testHandler {
 	return &testHandler{
-		es: es,
+		elasticService: elasticService,
+		log:            log,
 	}
 }
 

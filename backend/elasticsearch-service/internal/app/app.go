@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/Enthreeka/elasticsearch-service/internal/config"
 	"github.com/Enthreeka/elasticsearch-service/internal/delivery/http"
+	"github.com/Enthreeka/elasticsearch-service/internal/repo"
+	"github.com/Enthreeka/elasticsearch-service/internal/service"
 	"github.com/Enthreeka/elasticsearch-service/pkg/elasticsearch"
 	"github.com/Enthreeka/elasticsearch-service/pkg/logger"
 	"os"
@@ -21,7 +23,11 @@ func Run(log *logger.Logger, cfg *config.Config) error {
 		log.Fatal("error creating the client: %s", err)
 	}
 
-	server := http.NewServer(log, http.Services{Elastic: es}, http.ServerOption{
+	elasticRepo := repo.NewElasticRepo(es, log)
+
+	elasticUsecase := service.NewElasticService(elasticRepo)
+
+	server := http.NewServer(log, http.Services{Elastic: elasticUsecase}, http.ServerOption{
 		Addr: fmt.Sprintf(":%s", cfg.HTTPServer.Port),
 	})
 

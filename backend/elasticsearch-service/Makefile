@@ -10,7 +10,7 @@ server:
 
 
 docker-up:
-	docker compose -f docker-compose.yaml.local up --build
+	docker compose -f docker-compose.local.yaml up --build
 
 docker-down:
-	docker compose -f docker-compose.yaml.local down
+	docker compose -f docker-compose.local.yaml down

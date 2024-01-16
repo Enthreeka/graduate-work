@@ -1,11 +1,11 @@
 package entity
 
 type Test struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	MAIL string `json:"mail"`
+	ID int `json:"id"`
 
-	Address     string `json:"address"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	Address     string `json:"address"`
+	MAIL        string `json:"mail"`
+	Name        string `json:"name"`
 }

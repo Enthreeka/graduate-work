@@ -55,7 +55,7 @@ func (e *elasticRepo) Index(ctx context.Context, data *entity.Test) error {
 		return errors.New("вывести ошибки при возвращении ответа")
 	}
 
-	e.log.Info("document indexed:", response.String())
+	e.log.Info("document indexed: %s", response.String())
 	return nil
 }
 

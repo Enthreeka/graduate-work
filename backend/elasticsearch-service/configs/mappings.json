@@ -1,0 +1,30 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "search_analyzer" : "standard"
+      },
+      "description": {
+        "type": "text",
+        "search_analyzer" : "standard"
+      },
+      "address": {
+        "type": "text",
+        "search_analyzer" : "standard"
+      },
+      "mail": {
+        "type": "text",
+        "search_analyzer" : "standard"
+      },
+      "name": {
+        "type": "text",
+        "search_analyzer" : "standard"
+      }
+    }
+  }
+}

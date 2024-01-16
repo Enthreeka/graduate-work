@@ -17,7 +17,7 @@ func Router(log *logger.Logger, service Services) *chi.Mux {
 	test := handler.NewTestHandler(service.Elastic, log)
 
 	mux.Route("/", func(r chi.Router) {
-		r.Route("api/v1", func(r chi.Router) {
+		r.Route("/api/v1", func(r chi.Router) {
 			r.Post("/", test.Create)
 			r.Get("/", test.Get)
 		})

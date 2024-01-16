@@ -11,10 +11,8 @@ type Elastic struct {
 	*elasticsearch.Client
 }
 
-func New(cloudID, apiKey string) (*Elastic, error) {
+func New() (*Elastic, error) {
 	cfg := elasticsearch.Config{
-		CloudID:       cloudID,
-		APIKey:        apiKey,
 		Addresses:     []string{"http://localhost:9200"},
 		RetryOnStatus: []int{429, 502, 503, 504},
 		RetryBackoff: func(attempt int) time.Duration {

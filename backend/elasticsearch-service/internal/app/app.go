@@ -15,10 +15,10 @@ import (
 )
 
 func Run(log *logger.Logger, cfg *config.Config) error {
-	_, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
-	es, err := elasticsearch.New("", "")
+	es, err := elasticsearch.New()
 	if err != nil {
 		log.Fatal("error creating the client: %s", err)
 	}
@@ -36,5 +36,7 @@ func Run(log *logger.Logger, cfg *config.Config) error {
 		log.Fatal("listen: %s", err)
 	}
 
+	<-ctx.Done()
+	server.Shutdown(ctx)
 	return nil
 }

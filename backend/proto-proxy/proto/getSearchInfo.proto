@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+import "movie.proto";
+
+option go_package = "./;proto";
+
+message GetSearchInfoRequest{
+    string query = 1[json_name = "query"];
+}
+
+message GetSearchInfoResponse{
+    Movie Movie = 1[json_name = "movie"];
+}

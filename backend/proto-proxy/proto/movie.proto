@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+option go_package = "./;proto";
+
+message Movie {
+  string title = 1 [json_name = "title"];
+  int64 id = 2 [json_name = "id"];
+  int64 budget = 3 [json_name = "budget"];
+  repeated string genres = 4 [json_name = "genres"];
+  string homepage = 5 [json_name = "homepage"];
+  string original_language = 6 [json_name = "originalLanguage"];
+  string overview = 7 [json_name = "overview"];
+  string release_date = 8 [json_name = "releaseDate"];
+  string runtime = 9 [json_name = "runtime"];
+
+  repeated Similar similar = 10 [json_name = "similar"];
+  repeated Writers writers = 11 [json_name = "writers"];
+  repeated Cast cast = 12 [json_name = "cast"];
+}
+
+message Similar {
+  int64  id = 1 [json_name = "id"];
+  string title = 2 [json_name = "title"];
+}
+
+message Writers {
+  int64  id = 1 [json_name = "id"];
+  string name = 2 [json_name = "name"];
+}
+
+message Cast {
+  int64  id = 1 [json_name = "id"];
+  string name = 2 [json_name = "name"];
+}

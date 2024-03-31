@@ -1,0 +1,1 @@
+Take proto file in `google/api/*` from [googleapis](https://github.com/googleapis/googleapis)

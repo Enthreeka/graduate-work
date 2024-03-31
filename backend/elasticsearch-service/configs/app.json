@@ -1,0 +1,10 @@
+{
+  "elasticsearch": {
+  "addr": [
+      "http://localhost:9200"
+  ]
+  },
+  "kibana": {
+    "addr": "http://localhost:5601"
+  }
+}

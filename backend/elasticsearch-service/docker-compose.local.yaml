@@ -1,14 +1,5 @@
 
 services:
-  elasticsearch-service:
-    container_name: elasticsearch-service
-    build: ./
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    ports:
-      - "8080:8080"
-
   elasticsearch:
     image: elasticsearch:8.11.0
     container_name: elasticsearch

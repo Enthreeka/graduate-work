@@ -1,0 +1,17 @@
+//{
+//  "uuid": "",
+//  "name": "",
+//  "description": "",
+//  "department": "",
+//  "address": "",
+//  "mail": "",
+//  "salary": ""
+//}
+
+{
+  "synonyms":[
+    "data.1",
+    "data.2",
+    "data.N"
+  ]
+}

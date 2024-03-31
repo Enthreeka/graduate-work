@@ -1,29 +1,96 @@
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 0
+    "number_of_replicas": 0,
+    "analysis": {
+      "analyzer": {
+        "autocomplete_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "name_synonym_filter",
+            "lowercase",
+            "remove_duplicates",
+            "ngram_filter"
+          ]
+        }
+      },
+      "filter": {
+        "ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20
+        },
+        "name_synonym_filter" : {
+          "type": "synonym",
+          "synonyms": [
+          ]
+        }
+      }
+    }
   },
   "mappings": {
     "properties": {
+      "budget": {
+        "type": "integer"
+      },
+      "genres": {
+        "type": "keyword"
+      },
+      "homepage": {
+        "type": "text"
+      },
+      "id": {
+        "type": "integer"
+      },
+      "original_language": {
+        "type": "keyword"
+      },
+      "overview": {
+        "type": "text"
+      },
+      "release_date": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      },
+      "runtime": {
+        "type": "integer"
+      },
       "title": {
-        "type": "text",
-        "search_analyzer" : "standard"
+        "type": "text"
       },
-      "description": {
-        "type": "text",
-        "search_analyzer" : "standard"
+      "similar": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "text"
+          }
+        }
       },
-      "address": {
-        "type": "text",
-        "search_analyzer" : "standard"
+      "writers": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "text"
+          }
+        }
       },
-      "mail": {
-        "type": "text",
-        "search_analyzer" : "standard"
-      },
-      "name": {
-        "type": "text",
-        "search_analyzer" : "standard"
+      "cast": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "text"
+          }
+        }
       }
     }
   }

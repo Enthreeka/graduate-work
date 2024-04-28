@@ -45,8 +45,13 @@ func Run(cfg *config.Config, log *logger.Logger) {
 		log.Fatal("RegisterGatewayHandlerServer: %v", err)
 	}
 
-	log.Info("Server listening at %s", cfg.Gateway.Port)
-	if err := http.ListenAndServe(cfg.Gateway.Port, mux); err != nil {
+	srv := &http.Server{
+		Addr:    cfg.Gateway.Port,
+		Handler: handler.MiddlewareLogger(log, mux),
+	}
+
+	log.Info("Server listening at localhost%s", cfg.Gateway.Port)
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal("failed to lister and server: %v", err)
 	}
 }

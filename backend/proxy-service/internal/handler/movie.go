@@ -53,5 +53,7 @@ func (h *Handler) GetSearchInfo(ctx context.Context, _ *pb.GetSearchInfoRequest)
 		return nil, SwitchToGrpcStatus(http.StatusInternalServerError)
 	}
 
+	//s, exist := status.FromError(err)
+
 	return response, nil
 }

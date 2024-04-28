@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.33.0
 // 	protoc        v3.21.12
-// source: getSearchInfo.proto
+// source: GetAllMovie.proto
 
 package proto
 

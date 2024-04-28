@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+import "movie.proto";
+
+option go_package = "./;proto";
+
+
+message UpdateMovieDataRequest {
+  Movie movie = 1 [json_name = "movie"];
+}
+
+message UpdateMovieDataResponse {
+  string status = 1;
+}

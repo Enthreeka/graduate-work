@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+
+option go_package = "./;proto";
+
+message DeleteMovieRequest {
+  int64 movie_id = 1 [json_name = "movieID"];
+  string title = 2 [json_name = "title"];
+}
+
+message DeleteMovieResponse {
+
+}

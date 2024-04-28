@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+import "movie.proto";
+
+option go_package = "./;proto";
+
+message SearchMovieRequest {
+  string query = 1 [json_name = "query"];
+}
+
+message SearchMovieResponse {
+  Movie movie = 1 [json_name = "movie"];
+
+  // Пишется в случаях, если был найден не точный запрос, а похожий
+  string status = 2 [json_name = "status"];
+}

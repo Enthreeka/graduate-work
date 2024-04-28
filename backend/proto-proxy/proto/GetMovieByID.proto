@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+import "movie.proto";
+
+option go_package = "./;proto";
+
+message GetMovieByIDRequest {
+  int64 movie_id = 1[json_name = "movieID"];
+}
+
+message GetMovieByIDResponse {
+  Movie movie = 1 [json_name = "movie"];
+}
+

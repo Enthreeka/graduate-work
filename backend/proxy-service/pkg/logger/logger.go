@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const serviceName = "[ELASTICSEARCH-SERVICE] "
+const serviceName = "[REVERSE-PROXY] "
 
 type Logger struct {
 	sugarLogger *zap.SugaredLogger
@@ -25,7 +25,7 @@ func (l *Logger) Error(format string, v ...any) {
 	builder.WriteString(serviceName)
 	builder.WriteString(format)
 
-	l.sugarLogger.Errorf(builder.String(), v...)
+	l.sugarLogger.Errorf(format, v...)
 }
 
 func (l *Logger) Fatal(format string, v ...any) {
@@ -37,7 +37,6 @@ func (l *Logger) Fatal(format string, v ...any) {
 }
 
 func New() *Logger {
-
 	config := zap.NewDevelopmentConfig()
 	config.DisableStacktrace = true
 
@@ -54,4 +53,21 @@ func New() *Logger {
 	}
 
 	return log
+}
+
+type Log interface {
+	Info(format string, v ...any)
+	Error(format string, v ...any)
+}
+
+var (
+	DefaultLogger Log = New()
+)
+
+func Info(format string, v ...any) {
+	DefaultLogger.Info(format, v...)
+}
+
+func Error(format string, v ...any) {
+	DefaultLogger.Error(format, v...)
 }

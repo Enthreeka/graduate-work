@@ -14,7 +14,7 @@ func main() {
 		log.Fatal("failed load config: %v", err)
 	}
 
-	if err := app.Run(log, cfg); err != nil {
-		log.Fatal("failed to run server: %v", err)
-	}
+	newApp := app.NewApp()
+
+	newApp.Run(log, cfg)
 }

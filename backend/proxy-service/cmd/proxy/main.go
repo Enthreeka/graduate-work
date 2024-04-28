@@ -1,7 +1,17 @@
 package main
 
-import _ "github.com/Entreeka/proto-proxy/go"
+import (
+	"github.com/Enthreeka/proxy-service/internal/app"
+	"github.com/Enthreeka/proxy-service/internal/config"
+	"github.com/Enthreeka/proxy-service/pkg/logger"
+)
 
 func main() {
+	log := logger.New()
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatal("failed to get config", err)
+	}
 
+	app.Run(cfg, log)
 }

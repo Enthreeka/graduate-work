@@ -12,12 +12,12 @@ import (
 )
 
 type testHandler struct {
-	elasticService service.ElasticUsecase
+	elasticService service.ElasticService
 
 	log *logger.Logger
 }
 
-func NewTestHandler(elasticService service.ElasticUsecase, log *logger.Logger) *testHandler {
+func NewTestHandler(elasticService service.ElasticService, log *logger.Logger) *testHandler {
 	return &testHandler{
 		elasticService: elasticService,
 		log:            log,

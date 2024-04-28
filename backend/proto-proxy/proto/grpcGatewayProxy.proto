@@ -5,17 +5,16 @@ package proxy_proto;
 import "getSearchInfo.proto";
 
 import "google/api/annotations.proto";
-import "google/api/http.proto";
+//import "google/api/http.proto";
 
 
 option go_package = "./;proto";
 
-service ELKProxyService {
+service Gateway {
 
   rpc GetSearchInfo(GetSearchInfoRequest) returns (GetSearchInfoResponse){
     option (google.api.http) = {
       get: "/v1/api/movie"
-      body: "*"
     };
   }
 

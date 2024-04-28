@@ -20,6 +20,7 @@ CMD protoc \
    --validate_out=lang=go:../go \
    --go_out=../go \
    --go-grpc_out=../go \
+   --grpc-gateway_out=../go \
    -I=. \
    -I=/usr/include \
   *.proto

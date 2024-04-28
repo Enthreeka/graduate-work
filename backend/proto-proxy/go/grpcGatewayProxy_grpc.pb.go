@@ -19,89 +19,89 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ELKProxyService_GetSearchInfo_FullMethodName = "/proxy_proto.ELKProxyService/GetSearchInfo"
+	Gateway_GetSearchInfo_FullMethodName = "/proxy_proto.Gateway/GetSearchInfo"
 )
 
-// ELKProxyServiceClient is the client API for ELKProxyService service.
+// GatewayClient is the client API for Gateway service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ELKProxyServiceClient interface {
+type GatewayClient interface {
 	GetSearchInfo(ctx context.Context, in *GetSearchInfoRequest, opts ...grpc.CallOption) (*GetSearchInfoResponse, error)
 }
 
-type eLKProxyServiceClient struct {
+type gatewayClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewELKProxyServiceClient(cc grpc.ClientConnInterface) ELKProxyServiceClient {
-	return &eLKProxyServiceClient{cc}
+func NewGatewayClient(cc grpc.ClientConnInterface) GatewayClient {
+	return &gatewayClient{cc}
 }
 
-func (c *eLKProxyServiceClient) GetSearchInfo(ctx context.Context, in *GetSearchInfoRequest, opts ...grpc.CallOption) (*GetSearchInfoResponse, error) {
+func (c *gatewayClient) GetSearchInfo(ctx context.Context, in *GetSearchInfoRequest, opts ...grpc.CallOption) (*GetSearchInfoResponse, error) {
 	out := new(GetSearchInfoResponse)
-	err := c.cc.Invoke(ctx, ELKProxyService_GetSearchInfo_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Gateway_GetSearchInfo_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ELKProxyServiceServer is the server API for ELKProxyService service.
-// All implementations must embed UnimplementedELKProxyServiceServer
+// GatewayServer is the server API for Gateway service.
+// All implementations must embed UnimplementedGatewayServer
 // for forward compatibility
-type ELKProxyServiceServer interface {
+type GatewayServer interface {
 	GetSearchInfo(context.Context, *GetSearchInfoRequest) (*GetSearchInfoResponse, error)
-	mustEmbedUnimplementedELKProxyServiceServer()
+	mustEmbedUnimplementedGatewayServer()
 }
 
-// UnimplementedELKProxyServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedELKProxyServiceServer struct {
+// UnimplementedGatewayServer must be embedded to have forward compatible implementations.
+type UnimplementedGatewayServer struct {
 }
 
-func (UnimplementedELKProxyServiceServer) GetSearchInfo(context.Context, *GetSearchInfoRequest) (*GetSearchInfoResponse, error) {
+func (UnimplementedGatewayServer) GetSearchInfo(context.Context, *GetSearchInfoRequest) (*GetSearchInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSearchInfo not implemented")
 }
-func (UnimplementedELKProxyServiceServer) mustEmbedUnimplementedELKProxyServiceServer() {}
+func (UnimplementedGatewayServer) mustEmbedUnimplementedGatewayServer() {}
 
-// UnsafeELKProxyServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ELKProxyServiceServer will
+// UnsafeGatewayServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to GatewayServer will
 // result in compilation errors.
-type UnsafeELKProxyServiceServer interface {
-	mustEmbedUnimplementedELKProxyServiceServer()
+type UnsafeGatewayServer interface {
+	mustEmbedUnimplementedGatewayServer()
 }
 
-func RegisterELKProxyServiceServer(s grpc.ServiceRegistrar, srv ELKProxyServiceServer) {
-	s.RegisterService(&ELKProxyService_ServiceDesc, srv)
+func RegisterGatewayServer(s grpc.ServiceRegistrar, srv GatewayServer) {
+	s.RegisterService(&Gateway_ServiceDesc, srv)
 }
 
-func _ELKProxyService_GetSearchInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Gateway_GetSearchInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetSearchInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ELKProxyServiceServer).GetSearchInfo(ctx, in)
+		return srv.(GatewayServer).GetSearchInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ELKProxyService_GetSearchInfo_FullMethodName,
+		FullMethod: Gateway_GetSearchInfo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ELKProxyServiceServer).GetSearchInfo(ctx, req.(*GetSearchInfoRequest))
+		return srv.(GatewayServer).GetSearchInfo(ctx, req.(*GetSearchInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ELKProxyService_ServiceDesc is the grpc.ServiceDesc for ELKProxyService service.
+// Gateway_ServiceDesc is the grpc.ServiceDesc for Gateway service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ELKProxyService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proxy_proto.ELKProxyService",
-	HandlerType: (*ELKProxyServiceServer)(nil),
+var Gateway_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proxy_proto.Gateway",
+	HandlerType: (*GatewayServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetSearchInfo",
-			Handler:    _ELKProxyService_GetSearchInfo_Handler,
+			Handler:    _Gateway_GetSearchInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

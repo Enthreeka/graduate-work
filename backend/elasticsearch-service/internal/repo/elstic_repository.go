@@ -25,7 +25,7 @@ type elasticRepo struct {
 	log     *logger.Logger
 }
 
-func NewElasticRepo(elasticsearch *client.Elastic, log *logger.Logger) *elasticRepo {
+func NewElasticRepo(elasticsearch *client.Elastic, log *logger.Logger) Elastic {
 	return &elasticRepo{
 		elasticsearch,
 		log,

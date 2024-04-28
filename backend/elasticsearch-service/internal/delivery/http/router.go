@@ -8,7 +8,7 @@ import (
 )
 
 type Services struct {
-	Elastic service.ElasticUsecase
+	Elastic service.ElasticService
 }
 
 func Router(log *logger.Logger, service Services) *chi.Mux {

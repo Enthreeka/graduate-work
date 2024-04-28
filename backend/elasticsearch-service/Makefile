@@ -14,3 +14,7 @@ docker-up:
 
 docker-down:
 	docker compose -f docker-compose.local.yaml down
+
+
+mock-usecase:
+	mockgen -source usecase.go -destination mock/elastic_mock.go

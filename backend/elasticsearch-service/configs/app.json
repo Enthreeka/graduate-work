@@ -1,4 +1,5 @@
 {
+  "is_debug_level": true,
   "elasticsearch": {
   "addr": [
       "http://localhost:9200"

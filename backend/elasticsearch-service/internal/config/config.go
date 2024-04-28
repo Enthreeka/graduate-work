@@ -8,8 +8,15 @@ import (
 
 type (
 	Config struct {
+		IsDebugLevel bool `json:"is_debug_level"`
+
 		HTTPServer HTTPServer `json:"http_server"`
 		JSON       JSON       `json:"elasticsearch"`
+		GRPC       GRPC       `json:"grpc"`
+	}
+
+	GRPC struct {
+		Addr string `json:"addr"`
 	}
 
 	HTTPServer struct {
@@ -58,6 +65,9 @@ func New() (*Config, error) {
 			Kibana: Kibana{
 				Addr: jsonFile.Kibana.Addr,
 			},
+		},
+		GRPC: GRPC{
+			Addr: os.Getenv("ADDR"),
 		},
 	}
 

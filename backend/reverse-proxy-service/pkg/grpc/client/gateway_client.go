@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/Enthreeka/proxy-service/pkg/logger"
+	"github.com/Enthreeka/reverse-proxy-service/pkg/logger"
 	pb "github.com/Entreeka/proto-proxy/go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -20,25 +20,6 @@ func NewGrpcClient(log *logger.Logger, address string) *GatewayClient {
 		address: address,
 	}
 }
-
-//func (g *GatewayClient) initConnect(ctx context.Context) {
-//	for {
-//		select {
-//		case <-ctx.Done():
-//			g.log.Info("context cancel grpc connection")
-//			return
-//		default:
-//			conn, err := grpc.Dial(
-//				g.address,
-//				grpc.WithTransportCredentials(insecure.NewCredentials()),
-//			)
-//			if err != nil {
-//				g.log.Fatal("failed to dial to grpc: error = %v, address = ", err, g.address)
-//			}
-//			g.connection = conn
-//		}
-//	}
-//}
 
 func (g *GatewayClient) Connect() (interface{}, error) {
 	g.log.Info("Established connections to elasticsearch-service")

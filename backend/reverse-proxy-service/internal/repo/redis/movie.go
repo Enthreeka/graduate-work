@@ -2,7 +2,7 @@ package redis
 
 import (
 	"context"
-	"github.com/Enthreeka/proxy-service/pkg/redis"
+	"github.com/Enthreeka/reverse-proxy-service/pkg/redis"
 )
 
 type Repo interface {

@@ -2,8 +2,7 @@ package redis
 
 import (
 	"context"
-	"github.com/Enthreeka/proxy-service/internal/config"
-	"github.com/Enthreeka/proxy-service/pkg/logger"
+	"github.com/Enthreeka/reverse-proxy-service/pkg/logger"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -19,13 +18,13 @@ func (r *Redis) Close() {
 	}
 }
 
-func New(ctx context.Context, cfg *config.Config) (*Redis, error) {
+func New(ctx context.Context, host, password string, minIdleCons, db int) (*Redis, error) {
 	// TODO сделать настройки
 	client := redis.NewClient(&redis.Options{
-		Addr:     cfg.Redis.Host,
-		Password: cfg.Redis.Password,
-		//MinIdleConns: cfg.Redis.MinIdleConns,
-		DB: cfg.Redis.Db,
+		Addr:         host,
+		Password:     password,
+		MinIdleConns: minIdleCons,
+		DB:           db,
 	})
 
 	err := client.Ping(ctx).Err()

@@ -1,0 +1,15 @@
+services:
+
+  sender-service:
+    container_name: reverse-reverse-proxy-service
+    build: ./
+    depends_on:
+      broker:
+        condition: service_healthy
+    ports:
+      - "9001:9001"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

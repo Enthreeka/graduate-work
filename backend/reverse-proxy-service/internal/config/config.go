@@ -40,10 +40,16 @@ func New() (*Config, error) {
 
 	config := &Config{
 		Gateway: Gateway{
-			Port: os.Getenv("port"),
+			Port: os.Getenv("PORT_GATEWAY"),
 		},
 		GRPC: GRPC{
-			ElasticsearchService: os.Getenv("elasticsearchService"),
+			ElasticsearchService: os.Getenv("ELASTICSEARCH_SERVICE"),
+		},
+		Redis: Redis{
+			Password:    os.Getenv("PASSWORD_REDIS"),
+			Host:        os.Getenv("HOST_REDIS"),
+			Db:          parseEnvInt(os.Getenv("DB_REDIS")),
+			MinIdleCons: parseEnvInt(os.Getenv("MIN_IDLE_CONS_REDIS")),
 		},
 	}
 

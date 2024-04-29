@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Enthreeka/proxy-service/pkg/logger"
+	"github.com/Enthreeka/reverse-proxy-service/pkg/logger"
 	"net/http"
 	"time"
 )
@@ -10,7 +10,7 @@ import (
 func MiddlewareLogger(log *logger.Logger, h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		log.Info("%s - %s (%v), proto: %s", r.Method, r.URL.Path, time.Since(startTime), r.Proto)
+		log.Info("%s - %s (%v), proto: %s, headers: %s", r.Method, r.URL.Path, time.Since(startTime), r.Proto, "[TODO]")
 		h.ServeHTTP(w, r)
 	})
 }

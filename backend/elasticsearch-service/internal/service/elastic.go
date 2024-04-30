@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/Enthreeka/elasticsearch-service/internal/entity"
 	"github.com/Enthreeka/elasticsearch-service/internal/repo"
+	pb "github.com/Entreeka/proto-proxy/go"
 )
 
 type elasticService struct {
@@ -17,11 +18,11 @@ func NewElasticService(elasticRepo repo.Elastic) ElasticService {
 	}
 }
 
-func (e *elasticService) Index(ctx context.Context, data *entity.Test) error {
+func (e *elasticService) Index(ctx context.Context, data *pb.Movie) error {
 	return e.elasticRepo.Index(ctx, data)
 }
 
-func (e *elasticService) IndexBulkAPI(ctx context.Context, data []*entity.Test) error {
+func (e *elasticService) IndexBulkAPI(ctx context.Context, data []*pb.Movie) error {
 	return e.elasticRepo.IndexWithBulk(ctx, data)
 }
 
@@ -36,4 +37,8 @@ func (e *elasticService) Search(ctx context.Context) (*entity.SearchResponse, er
 	}
 
 	return searchResponse, nil
+}
+
+func (e *elasticService) SearchAll(ctx context.Context) (*pb.GetAllMovieResponse, error) {
+	return e.elasticRepo.QueryAllDataInIndex(ctx)
 }

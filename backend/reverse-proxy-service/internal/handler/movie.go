@@ -6,10 +6,14 @@ import (
 	"github.com/Enthreeka/reverse-proxy-service/pkg/logger"
 	pb "github.com/Entreeka/proto-proxy/go"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"net/http"
 	"strconv"
+	"strings"
 )
+
+const getMovieApi = "/v1/api/movie/get/"
 
 type Handler struct {
 	pb.UnimplementedGatewayServer
@@ -58,30 +62,65 @@ func (h *Handler) GetAllMovie(ctx context.Context, _ *pb.GetAllMovieRequest) (*p
 
 func (h *Handler) CreateNewMovie(ctx context.Context, req *pb.CreateNewMovieRequest) (*pb.CreateNewMovieResponse, error) {
 	response := new(pb.CreateNewMovieResponse)
+	h.Log.Info("CreateNewMovie request: %v", req.Movie)
+
+	if err := req.Validate(); err != nil {
+		h.Log.Error("CreateNewMovie: validation error: %v", err)
+		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
+	}
+
+	response, err := h.ClientElastic.CreateNewMovie(ctx, req)
+	if s, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("CreateNewMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		return nil, err
+	}
 
 	return response, nil
 }
 
-func (h *Handler) GetIndices(ctx context.Context, req *pb.GetIndicesRequest) (*pb.GetIndicesResponse, error) {
+func (h *Handler) GetIndices(ctx context.Context, _ *pb.GetIndicesRequest) (*pb.GetIndicesResponse, error) {
 	response := new(pb.GetIndicesResponse)
+
+	response, err := h.ClientElastic.GetIndices(ctx, &pb.GetIndicesRequest{})
+	if s, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("CreateNewMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		return nil, err
+	}
 
 	return response, nil
 }
 
 // https://blog.logrocket.com/guide-to-grpc-gateway/
-func (h *Handler) GetMovieByID(ctx context.Context, req *pb.GetMovieByIDRequest) (*pb.GetMovieByIDResponse, error) {
+func (h *Handler) GetMovieByID(ctx context.Context, _ *pb.GetMovieByIDRequest) (*pb.GetMovieByIDResponse, error) {
 	response := new(pb.GetMovieByIDResponse)
 
-	//md, _ := metadata.FromIncomingContext(ctx)
-	//
-	//h.Log.Info("%v", md)
-	//movieID, ok := md["movie_id"]
-	//if !ok {
-	//
-	//	return nil, SwitchToGrpcStatus(http.StatusBadRequest)
-	//}
+	md, exist := metadata.FromIncomingContext(ctx)
+	if !exist {
+		h.Log.Error("metadata from incoming context is empty in GetMovieByID")
+		return nil, SwitchToGrpcStatus(http.StatusInternalServerError, "metadata from incoming context is empty")
+	}
 
-	//h.Log.Info("%v", movieID)
+	url := md.Get("url")[0]
+	_, movieID, exist := strings.Cut(url, getMovieApi)
+	if !exist {
+		h.Log.Error("in url = [%s] not found some value", url)
+		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
+	}
+
+	movieIDInt, err := strconv.Atoi(movieID)
+	if err != nil {
+		h.Log.Error("movieID not [int] data type: %v", err)
+		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
+	}
+
+	h.Log.Info("GetMovieByID: redirect to elasticsearch-service - movie_id: %d", movieIDInt)
+	response, err = h.ClientElastic.GetMovieByID(ctx, &pb.GetMovieByIDRequest{
+		MovieId: int64(movieIDInt),
+	})
+	if s, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("GetMovieByID: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		return nil, err
+	}
 
 	return response, nil
 }
@@ -89,17 +128,26 @@ func (h *Handler) GetMovieByID(ctx context.Context, req *pb.GetMovieByIDRequest)
 func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (*pb.SearchMovieResponse, error) {
 	response := new(pb.SearchMovieResponse)
 
-	//exist, err := h.RedisRepo.IsExist(ctx)
-	//if err != nil {
-	//	h.Log.Error("GetSearchInfo IN RedisRepo.IsExist: %v", err)
-	//	return nil, SwitchToGrpcStatus(http.StatusInternalServerError)
-	//}
-	//
-	//if exist {
-	//
-	//} else {
-	//
-	//}
+	if req.GetQuery() == "" {
+		h.Log.Error("SearchMovie: empty query request")
+		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
+	}
+
+	movie, exist, err := h.RedisRepo.GetMovie(ctx, req.Query)
+	if err != nil {
+		h.Log.Error("SearchMovie: failed to search movie in redis - error: %v, movie_exist: %v", err, exist)
+		return nil, SwitchToGrpcStatus(http.StatusInternalServerError, err)
+	}
+	if !exist {
+		response, err = h.ClientElastic.SearchMovie(ctx, req)
+		if s, err := ErrorWrapper(err); err != nil {
+			h.Log.Error("SearchMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+			return nil, err
+		}
+	} else {
+		response.Movie = movie
+		response.Status = "delivered from Redis"
+	}
 
 	return response, nil
 }
@@ -107,11 +155,33 @@ func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (
 func (h *Handler) UpdateMovieData(ctx context.Context, req *pb.UpdateMovieDataRequest) (*pb.UpdateMovieDataResponse, error) {
 	response := new(pb.UpdateMovieDataResponse)
 
+	if err := req.Validate(); err != nil {
+		h.Log.Error("UpdateMovieData: validation error: %v", err)
+		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
+	}
+
+	response, err := h.ClientElastic.UpdateMovieData(ctx, req)
+	if s, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("UpdateMovieData: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		return nil, err
+	}
+
 	return response, nil
 }
 
 func (h *Handler) DeleteMovie(ctx context.Context, req *pb.DeleteMovieRequest) (*pb.DeleteMovieResponse, error) {
 	response := new(pb.DeleteMovieResponse)
+
+	if req.MovieId == 0 && req.Title == "" {
+		h.Log.Error("DeleteMovie: empty data in request")
+		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
+	}
+
+	response, err := h.ClientElastic.DeleteMovie(ctx, req)
+	if s, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("DeleteMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		return nil, err
+	}
 
 	return response, nil
 }

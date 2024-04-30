@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package proxy_proto;
 
+import "validate/validate.proto";
+
 option go_package = "./;proto";
 
 message Movie {
-  string title = 1 [json_name = "title"];
+  string title = 1 [json_name = "title", (validate.rules).string.min_len = 1];
   int64 id = 2 [json_name = "id"];
   int64 budget = 3 [json_name = "budget"];
   repeated string genres = 4 [json_name = "genres"];

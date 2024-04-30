@@ -39,13 +39,14 @@ service Gateway {
 
   rpc GetMovieByID(GetMovieByIDRequest) returns (GetMovieByIDResponse){
     option (google.api.http) = {
-      get: "/v1/api/movie/{movie_id}",
+      get: "/v1/api/movie/get/{movie_id}",
     };
   }
 
   rpc SearchMovie(SearchMovieRequest) returns (SearchMovieResponse){
     option (google.api.http) = {
-      get: "/v1/api/movie/search",
+      post: "/v1/api/movie/search",
+      body: "*"
     };
   }
 

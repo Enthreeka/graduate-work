@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+import "movie.proto";
+
+option go_package = "./;proto";
+
+message Shards {
+  int32 total = 1 [json_name = "total"];
+  int32 successful = 2 [json_name = "successful"];
+  int32 skipped = 3 [json_name = "skipped"];
+  int32 failed = 4 [json_name = "failed"];
+}
+
+message Total {
+  int64 value = 1 [json_name = "value"];
+  string relation = 2 [json_name = "relation"];
+}
+
+message Hits {
+  string _index = 1 [json_name = "_index"];
+  string  _id = 2 [json_name = "_id"];
+  float _score = 3 [json_name = "_score"];
+
+  Movie _source = 4 [json_name = "_source"];
+}
+
+message TotalHits {
+  Total total = 1 [json_name = "total"];
+  float max_score = 2 [json_name = "max_score"];
+  repeated Hits hits = 3 [json_name = "hits"];
+}

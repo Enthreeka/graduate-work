@@ -7,6 +7,7 @@ import (
 	"github.com/Enthreeka/elasticsearch-service/internal/entity"
 	"github.com/Enthreeka/elasticsearch-service/internal/service"
 	"github.com/Enthreeka/elasticsearch-service/pkg/logger"
+	pb "github.com/Entreeka/proto-proxy/go"
 	"github.com/google/uuid"
 	"net/http"
 )
@@ -50,7 +51,7 @@ func (t *testHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Description: data.Description,
 	}
 
-	if err := t.elasticService.Index(context.Background(), test); err != nil {
+	if err := t.elasticService.Index(context.Background(), &pb.Movie{}); err != nil {
 		t.log.Error("elasticService.Index: %v", err)
 		HandleError(w, err, apperror.ParseHTTPErrStatusCode(err))
 		return

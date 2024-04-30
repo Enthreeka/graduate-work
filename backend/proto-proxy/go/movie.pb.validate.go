@@ -56,7 +56,16 @@ func (m *Movie) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for Title
+	if utf8.RuneCountInString(m.GetTitle()) < 1 {
+		err := MovieValidationError{
+			field:  "Title",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	// no validation rules for Id
 

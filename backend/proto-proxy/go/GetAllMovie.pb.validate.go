@@ -161,38 +161,66 @@ func (m *GetAllMovieResponse) validate(all bool) error {
 
 	var errors []error
 
-	for idx, item := range m.GetMovie() {
-		_, _ = idx, item
+	// no validation rules for Took
 
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, GetAllMovieResponseValidationError{
-						field:  fmt.Sprintf("Movie[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, GetAllMovieResponseValidationError{
-						field:  fmt.Sprintf("Movie[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return GetAllMovieResponseValidationError{
-					field:  fmt.Sprintf("Movie[%v]", idx),
+	// no validation rules for TimedOut
+
+	if all {
+		switch v := interface{}(m.GetXShards()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetAllMovieResponseValidationError{
+					field:  "XShards",
 					reason: "embedded message failed validation",
 					cause:  err,
-				}
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetAllMovieResponseValidationError{
+					field:  "XShards",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
 		}
+	} else if v, ok := interface{}(m.GetXShards()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetAllMovieResponseValidationError{
+				field:  "XShards",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
+	if all {
+		switch v := interface{}(m.GetHits()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetAllMovieResponseValidationError{
+					field:  "Hits",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetAllMovieResponseValidationError{
+					field:  "Hits",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetHits()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetAllMovieResponseValidationError{
+				field:  "Hits",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {

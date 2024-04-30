@@ -61,21 +61,21 @@ func (a *App) Run(log *logger.Logger, cfg *config.Config) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
-	if cfg.IsDebugLevel {
-		es, err := elasticsearch.New(cfg.JSON.Elasticsearch.Addr)
-		if err != nil {
-			log.Fatal("error creating the client: %s", err)
-		}
-
-		log.Info("Connected to elasticsearch addr: %v", es.Transport.(*elastictransport.Client).URLs())
-		log.Info("Connected to kibana addr: [%s]", cfg.JSON.Kibana.Addr)
-
-		a.elasticRepo = repo.NewElasticRepo(es, log)
-		a.elasticService = service.NewElasticService(a.elasticRepo)
-	} else {
-		var e service.ElasticService
-		a.elasticService = e
+	//if cfg.IsDebugLevel {
+	es, err := elasticsearch.New(cfg.JSON.Elasticsearch.Addr)
+	if err != nil {
+		log.Fatal("error creating the client: %s", err)
 	}
+
+	log.Info("Connected to elasticsearch addr: %v", es.Transport.(*elastictransport.Client).URLs())
+	log.Info("Connected to kibana addr: [%s]", cfg.JSON.Kibana.Addr)
+
+	a.elasticRepo = repo.NewElasticRepo(es, log)
+	a.elasticService = service.NewElasticService(a.elasticRepo)
+	//} else {
+	//	var e service.ElasticService
+	//	a.elasticService = e
+	//}
 
 	lis, err := net.Listen("tcp", cfg.GRPC.Addr)
 	if err != nil {

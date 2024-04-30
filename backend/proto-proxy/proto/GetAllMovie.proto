@@ -2,7 +2,8 @@ syntax = "proto3";
 
 package proxy_proto;
 
-import "movie.proto";
+import "elasticsearch.proto";
+
 
 option go_package = "./;proto";
 
@@ -11,5 +12,8 @@ message GetAllMovieRequest{
 }
 
 message GetAllMovieResponse{
-   repeated Movie movie = 1[json_name = "movie"];
+    int64 took = 1 [json_name = "took"];
+    bool timed_out = 2 [json_name = "timed_out"];
+    Shards _shards = 3 [json_name = "_shards"];
+    TotalHits hits = 4 [json_name = "hits"];
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/Enthreeka/elasticsearch-service/internal/service"
 	"github.com/Enthreeka/elasticsearch-service/pkg/logger"
 	pb "github.com/Entreeka/proto-proxy/go"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type movieHandler struct {
@@ -21,14 +23,31 @@ func NewMovieHandler(elasticService service.ElasticService, log *logger.Logger) 
 	}
 }
 
+func HandleError(c codes.Code, err error) error {
+	s := status.New(c, err.Error())
+	return s.Err()
+}
+
 func (h *movieHandler) GetAllMovie(ctx context.Context, _ *pb.GetAllMovieRequest) (*pb.GetAllMovieResponse, error) {
 	response := new(pb.GetAllMovieResponse)
+
+	response, err := h.elasticService.SearchAll(ctx)
+	if err != nil {
+		h.log.Error("CreateNewMovie: elasticService.Index: %v", err)
+		return nil, HandleError(codes.Internal, err)
+	}
 
 	return response, nil
 }
 
 func (h *movieHandler) CreateNewMovie(ctx context.Context, req *pb.CreateNewMovieRequest) (*pb.CreateNewMovieResponse, error) {
 	response := new(pb.CreateNewMovieResponse)
+	h.log.Info("CreateNewMovie: got message - %v", req.Movie)
+
+	if err := h.elasticService.Index(context.Background(), req.Movie); err != nil {
+		h.log.Error("CreateNewMovie: elasticService.Index: %v", err)
+		return nil, HandleError(codes.Internal, err)
+	}
 
 	return response, nil
 }

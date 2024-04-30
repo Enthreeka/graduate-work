@@ -161,12 +161,24 @@ func (m *GetMovieByIDResponse) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for XIndex
+
+	// no validation rules for XId
+
+	// no validation rules for XVersion
+
+	// no validation rules for XSeqNo
+
+	// no validation rules for XPrimaryTerm
+
+	// no validation rules for Found
+
 	if all {
-		switch v := interface{}(m.GetMovie()).(type) {
+		switch v := interface{}(m.GetXSource()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, GetMovieByIDResponseValidationError{
-					field:  "Movie",
+					field:  "XSource",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -174,16 +186,16 @@ func (m *GetMovieByIDResponse) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, GetMovieByIDResponseValidationError{
-					field:  "Movie",
+					field:  "XSource",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetMovie()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetXSource()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GetMovieByIDResponseValidationError{
-				field:  "Movie",
+				field:  "XSource",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

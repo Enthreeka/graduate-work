@@ -11,6 +11,12 @@ message GetMovieByIDRequest {
 }
 
 message GetMovieByIDResponse {
-  Movie movie = 1 [json_name = "movie"];
+  string _index = 1 [json_name = "_index"];
+  string  _id = 2 [json_name = "_id"];
+  int64 _version = 3 [json_name = "_version"];
+  int64 _seq_no = 4 [json_name = "_seq_no"];
+  int64 _primary_term = 5 [json_name = "_primary_term"];
+  bool found = 6 [json_name = "found"];
+  Movie _source = 7 [json_name = "_source"];
 }
 

@@ -75,10 +75,10 @@ func Run(cfg *config.Config, log *logger.Logger) {
 
 	srv := &http.Server{
 		Addr:    cfg.Gateway.Port,
-		Handler: handler.MiddlewareLogger(log, mux),
+		Handler: handler.MiddlewareLogger(log, handler.EnableCors(mux)),
 	}
 
-	log.Info("Server listening at localhost%s", cfg.Gateway.Port)
+	log.Info("Server listening at [http://localhost%s]", cfg.Gateway.Port)
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal("failed to lister and server: %v", err)
 	}

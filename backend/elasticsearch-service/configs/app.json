@@ -1,11 +1,14 @@
 {
-  "is_debug_level": true,
   "elasticsearch": {
-  "addr": [
+    "addr": [
       "http://localhost:9200"
-  ]
+    ],
+    "search_fields": ["overview","title","tagline","genres","name"]
   },
   "kibana": {
     "addr": "http://localhost:5601"
+  },
+  "GRPC": {
+    "addr": "localhost:9001"
   }
 }

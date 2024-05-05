@@ -2,13 +2,15 @@ package service
 
 import (
 	"context"
-	"github.com/Enthreeka/elasticsearch-service/internal/entity"
 	pb "github.com/Entreeka/proto-proxy/go"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type ElasticService interface {
 	Index(ctx context.Context, data *pb.Movie) error
 	IndexBulkAPI(ctx context.Context, data []*pb.Movie) error
-	Search(ctx context.Context) (*entity.SearchResponse, error)
-	SearchAll(ctx context.Context) (*pb.GetAllMovieResponse, error)
+	Search(ctx context.Context, query string) (*pb.SearchMovieResponse, error)
+	GetAllDocument(ctx context.Context) (*pb.GetAllMovieResponse, error)
+	GetDocumentByID(ctx context.Context, id int) (*pb.GetMovieByIDResponse, error)
+	GetIndexInfo(ctx context.Context, index []string) (map[string]*anypb.Any, error)
 }

@@ -26,6 +26,7 @@ const (
 	Gateway_SearchMovie_FullMethodName     = "/proxy_proto.Gateway/SearchMovie"
 	Gateway_UpdateMovieData_FullMethodName = "/proxy_proto.Gateway/UpdateMovieData"
 	Gateway_DeleteMovie_FullMethodName     = "/proxy_proto.Gateway/DeleteMovie"
+	Gateway_BulkAPI_FullMethodName         = "/proxy_proto.Gateway/BulkAPI"
 )
 
 // GatewayClient is the client API for Gateway service.
@@ -39,6 +40,7 @@ type GatewayClient interface {
 	SearchMovie(ctx context.Context, in *SearchMovieRequest, opts ...grpc.CallOption) (*SearchMovieResponse, error)
 	UpdateMovieData(ctx context.Context, in *UpdateMovieDataRequest, opts ...grpc.CallOption) (*UpdateMovieDataResponse, error)
 	DeleteMovie(ctx context.Context, in *DeleteMovieRequest, opts ...grpc.CallOption) (*DeleteMovieResponse, error)
+	BulkAPI(ctx context.Context, in *BulkAPIRequest, opts ...grpc.CallOption) (*BulkAPIResponse, error)
 }
 
 type gatewayClient struct {
@@ -112,6 +114,15 @@ func (c *gatewayClient) DeleteMovie(ctx context.Context, in *DeleteMovieRequest,
 	return out, nil
 }
 
+func (c *gatewayClient) BulkAPI(ctx context.Context, in *BulkAPIRequest, opts ...grpc.CallOption) (*BulkAPIResponse, error) {
+	out := new(BulkAPIResponse)
+	err := c.cc.Invoke(ctx, Gateway_BulkAPI_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GatewayServer is the server API for Gateway service.
 // All implementations must embed UnimplementedGatewayServer
 // for forward compatibility
@@ -123,6 +134,7 @@ type GatewayServer interface {
 	SearchMovie(context.Context, *SearchMovieRequest) (*SearchMovieResponse, error)
 	UpdateMovieData(context.Context, *UpdateMovieDataRequest) (*UpdateMovieDataResponse, error)
 	DeleteMovie(context.Context, *DeleteMovieRequest) (*DeleteMovieResponse, error)
+	BulkAPI(context.Context, *BulkAPIRequest) (*BulkAPIResponse, error)
 	mustEmbedUnimplementedGatewayServer()
 }
 
@@ -150,6 +162,9 @@ func (UnimplementedGatewayServer) UpdateMovieData(context.Context, *UpdateMovieD
 }
 func (UnimplementedGatewayServer) DeleteMovie(context.Context, *DeleteMovieRequest) (*DeleteMovieResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMovie not implemented")
+}
+func (UnimplementedGatewayServer) BulkAPI(context.Context, *BulkAPIRequest) (*BulkAPIResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BulkAPI not implemented")
 }
 func (UnimplementedGatewayServer) mustEmbedUnimplementedGatewayServer() {}
 
@@ -290,6 +305,24 @@ func _Gateway_DeleteMovie_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gateway_BulkAPI_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BulkAPIRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayServer).BulkAPI(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Gateway_BulkAPI_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayServer).BulkAPI(ctx, req.(*BulkAPIRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gateway_ServiceDesc is the grpc.ServiceDesc for Gateway service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,6 +357,10 @@ var Gateway_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMovie",
 			Handler:    _Gateway_DeleteMovie_Handler,
+		},
+		{
+			MethodName: "BulkAPI",
+			Handler:    _Gateway_BulkAPI_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -27,6 +27,7 @@ func New(addresses []string) (*Elastic, error) {
 			ResponseHeaderTimeout: time.Second,
 			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
 		},
+		EnableMetrics: true,
 	}
 
 	client, err := elasticsearch.NewClient(cfg)

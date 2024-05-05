@@ -6,15 +6,14 @@ import (
 	"strings"
 )
 
-const serviceName = "[REVERSE-PROXY] "
-
 type Logger struct {
 	sugarLogger *zap.SugaredLogger
+	serviceName string
 }
 
 func (l *Logger) Info(format string, v ...any) {
 	var builder strings.Builder
-	builder.WriteString(serviceName)
+	builder.WriteString(l.serviceName)
 	builder.WriteString(format)
 
 	l.sugarLogger.Infof(builder.String(), v...)
@@ -22,21 +21,21 @@ func (l *Logger) Info(format string, v ...any) {
 
 func (l *Logger) Error(format string, v ...any) {
 	var builder strings.Builder
-	builder.WriteString(serviceName)
+	builder.WriteString(l.serviceName)
 	builder.WriteString(format)
 
-	l.sugarLogger.Errorf(format, v...)
+	l.sugarLogger.Errorf(builder.String(), v...)
 }
 
 func (l *Logger) Fatal(format string, v ...any) {
 	var builder strings.Builder
-	builder.WriteString(serviceName)
+	builder.WriteString(l.serviceName)
 	builder.WriteString(format)
 
 	l.sugarLogger.Fatalf(builder.String(), v...)
 }
 
-func New() *Logger {
+func New(serviceName string) *Logger {
 	config := zap.NewDevelopmentConfig()
 	config.DisableStacktrace = true
 
@@ -50,6 +49,7 @@ func New() *Logger {
 
 	log := &Logger{
 		sugarLogger: sugarLogger,
+		serviceName: serviceName,
 	}
 
 	return log
@@ -61,7 +61,7 @@ type Log interface {
 }
 
 var (
-	DefaultLogger Log = New()
+	DefaultLogger Log = New("test")
 )
 
 func Info(format string, v ...any) {

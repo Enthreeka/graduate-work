@@ -37,7 +37,7 @@ func (g *GatewayClient) Connect() (interface{}, error) {
 
 	client := pb.NewGatewayClient(conn)
 
-	g.log.Info("Connect to grpc address = %s", g.address)
+	g.log.Info("Connect to grpc address = [http://%s]", g.address)
 	return client, nil
 }
 

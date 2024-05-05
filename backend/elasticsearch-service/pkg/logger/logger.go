@@ -55,3 +55,7 @@ func New() *Logger {
 
 	return log
 }
+
+func logstashSetting() {
+
+}

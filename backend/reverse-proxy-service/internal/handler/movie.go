@@ -42,7 +42,7 @@ func ErrorWrapper(err error) (*status.Status, error) {
 	if s, exist := status.FromError(err); exist {
 		grpcStatusCode, _ := strconv.Atoi(s.Code().String())
 
-		return s, SwitchToGrpcStatus(grpcStatusCode)
+		return s, SwitchToGrpcStatus(grpcStatusCode, s.Err())
 	}
 
 	return nil, nil
@@ -53,10 +53,11 @@ func (h *Handler) GetAllMovie(ctx context.Context, _ *pb.GetAllMovieRequest) (*p
 
 	response, err := h.ClientElastic.GetAllMovie(ctx, &pb.GetAllMovieRequest{})
 	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("GetAllMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		h.Log.Error("GetAllMovie: error: %v, message: %s, ", err, s.Message())
 		return nil, err
 	}
 
+	h.Log.Info("Get all movie by client elastic completed successfully")
 	return response, nil
 }
 
@@ -71,17 +72,18 @@ func (h *Handler) CreateNewMovie(ctx context.Context, req *pb.CreateNewMovieRequ
 
 	response, err := h.ClientElastic.CreateNewMovie(ctx, req)
 	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("CreateNewMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		h.Log.Error("CreateNewMovie: error: %v, message: %s, ", err, s.Message())
 		return nil, err
 	}
 
+	h.Log.Info("Creating movie in client elastic completed successfully")
 	return response, nil
 }
 
-func (h *Handler) GetIndices(ctx context.Context, _ *pb.GetIndicesRequest) (*pb.GetIndicesResponse, error) {
+func (h *Handler) GetIndices(ctx context.Context, req *pb.GetIndicesRequest) (*pb.GetIndicesResponse, error) {
 	response := new(pb.GetIndicesResponse)
 
-	response, err := h.ClientElastic.GetIndices(ctx, &pb.GetIndicesRequest{})
+	response, err := h.ClientElastic.GetIndices(ctx, req)
 	if s, err := ErrorWrapper(err); err != nil {
 		h.Log.Error("CreateNewMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
 		return nil, err
@@ -118,10 +120,11 @@ func (h *Handler) GetMovieByID(ctx context.Context, _ *pb.GetMovieByIDRequest) (
 		MovieId: int64(movieIDInt),
 	})
 	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("GetMovieByID: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		h.Log.Error("GetMovieByID: error: %v, message: %s, ", err, s.Message())
 		return nil, err
 	}
 
+	h.Log.Info("Getting movie by id from client elastic completed successfully")
 	return response, nil
 }
 
@@ -133,21 +136,23 @@ func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (
 		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
 	}
 
-	movie, exist, err := h.RedisRepo.GetMovie(ctx, req.Query)
-	if err != nil {
-		h.Log.Error("SearchMovie: failed to search movie in redis - error: %v, movie_exist: %v", err, exist)
-		return nil, SwitchToGrpcStatus(http.StatusInternalServerError, err)
+	h.Log.Info("SearchMovie: got message - %v", req.Query)
+
+	//movie, exist, err := h.RedisRepo.GetMovie(ctx, req.Query)
+	//if err != nil {
+	//	h.Log.Error("SearchMovie: failed to search movie in redis - error: %v, movie_exist: %v", err, exist)
+	//	return nil, SwitchToGrpcStatus(http.StatusInternalServerError, err)
+	//}
+	//if !exist {
+	response, err := h.ClientElastic.SearchMovie(ctx, req)
+	if s, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("SearchMovie: error: %v, message: %s, ", err, s.Message())
+		return nil, err
 	}
-	if !exist {
-		response, err = h.ClientElastic.SearchMovie(ctx, req)
-		if s, err := ErrorWrapper(err); err != nil {
-			h.Log.Error("SearchMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
-			return nil, err
-		}
-	} else {
-		response.Movie = movie
-		response.Status = "delivered from Redis"
-	}
+	//} else {
+	//response.Movie = movie
+	//response.Status = "delivered from Redis"
+	//}
 
 	return response, nil
 }
@@ -162,7 +167,7 @@ func (h *Handler) UpdateMovieData(ctx context.Context, req *pb.UpdateMovieDataRe
 
 	response, err := h.ClientElastic.UpdateMovieData(ctx, req)
 	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("UpdateMovieData: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		h.Log.Error("UpdateMovieData: error: %v, message: %s, ", err, s.Message())
 		return nil, err
 	}
 
@@ -179,7 +184,19 @@ func (h *Handler) DeleteMovie(ctx context.Context, req *pb.DeleteMovieRequest) (
 
 	response, err := h.ClientElastic.DeleteMovie(ctx, req)
 	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("DeleteMovie: error: %v, message: %v, internal_error: %v", err, s.Message(), s.Err())
+		h.Log.Error("DeleteMovie: error: %v, message: %s, ", err, s.Message())
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (h *Handler) BulkAPI(ctx context.Context, req *pb.BulkAPIRequest) (*pb.BulkAPIResponse, error) {
+	response := new(pb.BulkAPIResponse)
+
+	response, err := h.ClientElastic.BulkAPI(ctx, req)
+	if s, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("BulkAPI: error: %v, message: %s, ", err, s.Message())
 		return nil, err
 	}
 

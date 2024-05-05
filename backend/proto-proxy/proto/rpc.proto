@@ -9,6 +9,7 @@ import "GetMovieByID.proto";
 import "SearchMovie.proto";
 import "UpdateMovieData.proto";
 import "DeleteMovie.proto";
+import "BulkAPI.proto";
 
 import "google/api/annotations.proto";
 //import "google/protobuf/wrappers.proto";
@@ -45,14 +46,13 @@ service Gateway {
 
   rpc SearchMovie(SearchMovieRequest) returns (SearchMovieResponse){
     option (google.api.http) = {
-      post: "/v1/api/movie/search",
-      body: "*"
+      get: "/v1/api/movie/search",
     };
   }
 
   rpc UpdateMovieData(UpdateMovieDataRequest) returns (UpdateMovieDataResponse){
     option (google.api.http) = {
-      patch: "/v1/api/movie/update",
+      patch: "/v1/api/movie/update/{movie_id}",
       body: "*"
     };
   }
@@ -60,6 +60,13 @@ service Gateway {
   rpc DeleteMovie(DeleteMovieRequest) returns (DeleteMovieResponse){
     option (google.api.http) = {
       delete: "/v1/api/movie/delete",
+    };
+  }
+
+  rpc BulkAPI(BulkAPIRequest) returns (BulkAPIResponse){
+    option (google.api.http) = {
+      post: "/v1/api/movie/bulk",
+      body: "*"
     };
   }
 

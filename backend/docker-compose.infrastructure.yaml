@@ -29,10 +29,52 @@ services:
       - "5601:5601"
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - xpack.security.enabled=true
+      - xpack.fleet.isAirGapped=true
+      - xpack.security.encryptionKey=ce4ef0e9d2345c64ef336cd02ba5d85c
+      - xpack.encryptedSavedObjects.encryptionKey=ce4ef0e9d2345c64ef336cd02ba5d85c
+      - xpack.reporting.encryptionKey=ce4ef0e9d2345c64ef336cd02ba5d85c
+      - xpack.reporting.kibanaServer.hostname=localhost
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:5601" ]
       retries: 20
       interval: 5s
+
+  logstash:
+    image: logstash:8.11.0
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5000:5000"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: always
+
+#  apm-server:
+#    image: elastic/apm-server:8.13.0
+#    depends_on:
+#      elasticsearch:
+#        condition: service_healthy
+#      kibana:
+#        condition: service_healthy
+#    cap_add: [ "CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID" ]
+#    cap_drop: [ "ALL" ]
+#    ports:
+#      - 8200:8200
+#    command: >
+#      apm-server -e
+#        -E apm-server.rum.enabled=true
+#        -E setup.kibana.host=kibana:5601
+#        -E setup.template.settings.index.number_of_replicas=0
+#        -E apm-server.kibana.enabled=true
+#        -E apm-server.kibana.host=kibana:5601
+#        -E output.elasticsearch.hosts=["elasticsearch:9200"]
+#    healthcheck:
+#      interval: 10s
+#      retries: 12
+#      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
 
   redis:
     image: redis

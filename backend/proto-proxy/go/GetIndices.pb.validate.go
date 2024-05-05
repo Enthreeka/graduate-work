@@ -290,44 +290,49 @@ func (m *IndexInfo) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for IndexName
-
-	// no validation rules for DocumentCount
-
-	// no validation rules for ShardCount
-
-	// no validation rules for Primaries
-
-	// no validation rules for Replicas
-
-	// no validation rules for Status
-
-	if all {
-		switch v := interface{}(m.GetCreationDate()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, IndexInfoValidationError{
-					field:  "CreationDate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, IndexInfoValidationError{
-					field:  "CreationDate",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
+	{
+		sorted_keys := make([]string, len(m.GetIndices()))
+		i := 0
+		for key := range m.GetIndices() {
+			sorted_keys[i] = key
+			i++
 		}
-	} else if v, ok := interface{}(m.GetCreationDate()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return IndexInfoValidationError{
-				field:  "CreationDate",
-				reason: "embedded message failed validation",
-				cause:  err,
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetIndices()[key]
+			_ = val
+
+			// no validation rules for Indices[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, IndexInfoValidationError{
+							field:  fmt.Sprintf("Indices[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, IndexInfoValidationError{
+							field:  fmt.Sprintf("Indices[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return IndexInfoValidationError{
+						field:  fmt.Sprintf("Indices[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
 			}
+
 		}
 	}
 

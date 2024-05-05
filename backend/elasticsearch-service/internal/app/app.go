@@ -11,6 +11,7 @@ import (
 	pb "github.com/Entreeka/proto-proxy/go"
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	"go.elastic.co/apm/module/apmgrpc"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -22,19 +23,19 @@ import (
 //	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 //	defer cancel()
 //
-//	es, err := elasticsearch.New(cfg.JSON.Elasticsearch.Addr)
+//	es, err := elasticsearch.New(cfg.App.Elasticsearch.Addr)
 //	if err != nil {
 //		log.Fatal("error creating the client: %s", err)
 //	}
 //
 //	log.Info("Connected to elasticsearch addr: %v", es.Transport.(*elastictransport.Client).URLs())
-//	log.Info("Connected to kibana url: %s", cfg.JSON.Kibana.Addr)
+//	log.Info("Connected to kibana url: %s", cfg.App.Kibana.Addr)
 //
 //	elasticRepo := repo.NewElasticRepo(es, log)
 //
 //	ElasticService := service.NewElasticService(elasticRepo)
 //
-//	server := http.NewServer(log, http.Services{Elastic: ElasticService}, http.ServerOption{
+//	server := http.NewServer(log, http.Services{elastic: ElasticService}, http.ServerOption{
 //		Addr: fmt.Sprintf(":%s", cfg.HTTPServer.Port),
 //	})
 //
@@ -61,25 +62,20 @@ func (a *App) Run(log *logger.Logger, cfg *config.Config) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
-	//if cfg.IsDebugLevel {
-	es, err := elasticsearch.New(cfg.JSON.Elasticsearch.Addr)
+	es, err := elasticsearch.New(cfg.App.Elasticsearch.Addr)
 	if err != nil {
 		log.Fatal("error creating the client: %s", err)
 	}
 
 	log.Info("Connected to elasticsearch addr: %v", es.Transport.(*elastictransport.Client).URLs())
-	log.Info("Connected to kibana addr: [%s]", cfg.JSON.Kibana.Addr)
+	log.Info("Connected to kibana addr: [%s]", cfg.App.Kibana.Addr)
 
-	a.elasticRepo = repo.NewElasticRepo(es, log)
+	a.elasticRepo = repo.NewElasticRepo(es, log, cfg.App.Elasticsearch.SearchFields)
 	a.elasticService = service.NewElasticService(a.elasticRepo)
-	//} else {
-	//	var e service.ElasticService
-	//	a.elasticService = e
-	//}
 
-	lis, err := net.Listen("tcp", cfg.GRPC.Addr)
+	lis, err := net.Listen("tcp", cfg.App.GRPC.Addr)
 	if err != nil {
-		log.Fatal("failed to listen grpc addr: %s, error: %v", cfg.GRPC.Addr, err)
+		log.Fatal("failed to listen grpc addr: %s, error: %v", cfg.App.GRPC.Addr, err)
 	}
 
 	movieHandler := handler.NewMovieHandler(a.elasticService, log)
@@ -88,15 +84,16 @@ func (a *App) Run(log *logger.Logger, cfg *config.Config) {
 		grpc.ChainUnaryInterceptor(
 			handler.LoggerUnaryInterceptorServer(log),
 			grpc_recovery.UnaryServerInterceptor(),
+			apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery()),
 		),
 	}
 
 	s := grpc.NewServer(opts...)
 	pb.RegisterGatewayServer(s, movieHandler)
 
-	log.Info("Server listening on address: %s", cfg.GRPC.Addr)
+	log.Info("Server listening on address: [http://%s]", cfg.App.GRPC.Addr)
 	if err := s.Serve(lis); err != nil {
-		log.Fatal("failed to server grpc service on addr: %s, error: %v", cfg.GRPC.Addr, err)
+		log.Fatal("failed to server grpc service on addr: %s, error: %v", cfg.App.GRPC.Addr, err)
 	}
 
 	<-ctx.Done()

@@ -15,7 +15,7 @@ message Movie {
   string original_language = 6 [json_name = "originalLanguage"];
   string overview = 7 [json_name = "overview"];
   string release_date = 8 [json_name = "releaseDate"];
-  string runtime = 9 [json_name = "runtime"];
+  int32 runtime = 9 [json_name = "runtime"];
 
   repeated Similar similar = 10 [json_name = "similar"];
   repeated Writers writers = 11 [json_name = "writers"];

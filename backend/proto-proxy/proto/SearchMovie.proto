@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proxy_proto;
 
-import "movie.proto";
+import "elasticsearch.proto";
 
 option go_package = "./;proto";
 
@@ -11,7 +11,7 @@ message SearchMovieRequest {
 }
 
 message SearchMovieResponse {
-  Movie movie = 1 [json_name = "movie"];
+  TotalHits hits = 1 [json_name = "hits"];
 
   // Пишется в случаях, если был найден не точный запрос, а похожий
   string status = 2 [json_name = "status"];

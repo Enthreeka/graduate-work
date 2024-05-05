@@ -8,35 +8,30 @@ import (
 
 type (
 	Config struct {
-		IsDebugLevel bool `json:"is_debug_level"`
-
-		HTTPServer HTTPServer `json:"http_server"`
-		JSON       JSON       `json:"elasticsearch"`
-		GRPC       GRPC       `json:"grpc"`
-	}
-
-	GRPC struct {
-		Addr string `json:"addr"`
-	}
-
-	HTTPServer struct {
-		Hostname   string `json:"hostname"`
-		Port       string `json:"port"`
-		TypeServer string `json:"type_server"`
+		App App `json:"elasticsearch"`
 	}
 )
 
 type (
-	JSON struct {
+	App struct {
+		IsDebugLevel bool `json:"is_debug_level"`
+
 		Elasticsearch Elasticsearch `json:"elasticsearch"`
 		Kibana        Kibana        `json:"kibana"`
+		GRPC          GRPC          `json:"GRPC"`
 	}
 
 	Elasticsearch struct {
 		Addr []string `json:"addr"`
+
+		SearchFields []string `json:"search_fields"`
 	}
 
 	Kibana struct {
+		Addr string `json:"addr"`
+	}
+
+	GRPC struct {
 		Addr string `json:"addr"`
 	}
 )
@@ -53,28 +48,24 @@ func New() (*Config, error) {
 	}
 
 	config := &Config{
-		HTTPServer: HTTPServer{
-			Hostname:   os.Getenv("HTTP_SERVER_HOSTNAME"),
-			Port:       os.Getenv("HTTP_SERVER_PORT"),
-			TypeServer: os.Getenv("HTTP_SERVER_TYPE_SERVER"),
-		},
-		JSON: JSON{
+		App: App{
 			Elasticsearch: Elasticsearch{
-				Addr: jsonFile.Elasticsearch.Addr,
+				Addr:         jsonFile.Elasticsearch.Addr,
+				SearchFields: jsonFile.Elasticsearch.SearchFields,
 			},
 			Kibana: Kibana{
 				Addr: jsonFile.Kibana.Addr,
 			},
-		},
-		GRPC: GRPC{
-			Addr: os.Getenv("ADDR"),
+			GRPC: GRPC{
+				Addr: jsonFile.GRPC.Addr,
+			},
 		},
 	}
 
 	return config, nil
 }
 
-func NewDecoderJSON(path string) (*JSON, error) {
+func NewDecoderJSON(path string) (*App, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -83,7 +74,7 @@ func NewDecoderJSON(path string) (*JSON, error) {
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
-	config := &JSON{}
+	config := &App{}
 	if err := decoder.Decode(config); err != nil {
 		return nil, err
 	}

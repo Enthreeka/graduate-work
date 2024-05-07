@@ -9,6 +9,7 @@ option go_package = "./;proto";
 
 message UpdateMovieDataRequest {
   Movie movie = 1 [json_name = "movie"];
+  int64 movie_id = 2 [json_name = "movie_id"];
 }
 
 message UpdateMovieDataResponse {

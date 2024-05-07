@@ -3,9 +3,15 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <RouterView />
+  <div class="container">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
-
+.container {
+  max-width: 1299px;
+  padding: 20px;
+  margin: 0 auto;
+}
 </style>

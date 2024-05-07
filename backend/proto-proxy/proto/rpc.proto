@@ -11,6 +11,9 @@ import "UpdateMovieData.proto";
 import "DeleteMovie.proto";
 import "BulkAPI.proto";
 
+import "SearchMovieAggregator.proto";
+
+
 import "google/api/annotations.proto";
 //import "google/protobuf/wrappers.proto";
 //import "google/api/http.proto";
@@ -70,4 +73,9 @@ service Gateway {
     };
   }
 
+}
+
+
+service Aggregator {
+  rpc SearchMovieAggregator(SearchMovieAggregatorRequest) returns (SearchMovieAggregatorResponse){}
 }

@@ -86,6 +86,8 @@ func (m *UpdateMovieDataRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for MovieId
+
 	if len(errors) > 0 {
 		return UpdateMovieDataRequestMultiError(errors)
 	}

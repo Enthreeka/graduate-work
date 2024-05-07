@@ -15,6 +15,7 @@ type (
 
 	GRPC struct {
 		ElasticsearchService string `json:"elasticsearch_service"`
+		AggregatorService    string `json:"aggregator_service"`
 	}
 
 	Gateway struct {
@@ -44,6 +45,7 @@ func New() (*Config, error) {
 		},
 		GRPC: GRPC{
 			ElasticsearchService: os.Getenv("ELASTICSEARCH_SERVICE"),
+			AggregatorService:    os.Getenv("AGGREGATOR_SERVICE"),
 		},
 		Redis: Redis{
 			Password:    os.Getenv("PASSWORD_REDIS"),

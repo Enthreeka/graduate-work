@@ -183,6 +183,8 @@ func (m *Movie) validate(all bool) error {
 
 	}
 
+	// no validation rules for TrailerYt
+
 	if len(errors) > 0 {
 		return MovieMultiError(errors)
 	}

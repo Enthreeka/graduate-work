@@ -91,6 +91,9 @@
             "type": "text"
           }
         }
+      },
+      "trailer_yt": {
+        "type": "text"
       }
     }
   }

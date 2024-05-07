@@ -539,3 +539,372 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TotalHitsValidationError{}
+
+// Validate checks the field values on Suggest with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Suggest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Suggest with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SuggestMultiError, or nil if none found.
+func (m *Suggest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Suggest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetSimplePhrase() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SuggestValidationError{
+						field:  fmt.Sprintf("SimplePhrase[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SuggestValidationError{
+						field:  fmt.Sprintf("SimplePhrase[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SuggestValidationError{
+					field:  fmt.Sprintf("SimplePhrase[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return SuggestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SuggestMultiError is an error wrapping multiple validation errors returned
+// by Suggest.ValidateAll() if the designated constraints aren't met.
+type SuggestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SuggestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SuggestMultiError) AllErrors() []error { return m }
+
+// SuggestValidationError is the validation error returned by Suggest.Validate
+// if the designated constraints aren't met.
+type SuggestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SuggestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SuggestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SuggestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SuggestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SuggestValidationError) ErrorName() string { return "SuggestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SuggestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSuggest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SuggestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SuggestValidationError{}
+
+// Validate checks the field values on SimplePhrase with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SimplePhrase) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SimplePhrase with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SimplePhraseMultiError, or
+// nil if none found.
+func (m *SimplePhrase) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SimplePhrase) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Length
+
+	for idx, item := range m.GetOptions() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SimplePhraseValidationError{
+						field:  fmt.Sprintf("Options[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SimplePhraseValidationError{
+						field:  fmt.Sprintf("Options[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SimplePhraseValidationError{
+					field:  fmt.Sprintf("Options[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return SimplePhraseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SimplePhraseMultiError is an error wrapping multiple validation errors
+// returned by SimplePhrase.ValidateAll() if the designated constraints aren't met.
+type SimplePhraseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SimplePhraseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SimplePhraseMultiError) AllErrors() []error { return m }
+
+// SimplePhraseValidationError is the validation error returned by
+// SimplePhrase.Validate if the designated constraints aren't met.
+type SimplePhraseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SimplePhraseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SimplePhraseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SimplePhraseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SimplePhraseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SimplePhraseValidationError) ErrorName() string { return "SimplePhraseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SimplePhraseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSimplePhrase.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SimplePhraseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SimplePhraseValidationError{}
+
+// Validate checks the field values on Options with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Options) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Options with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in OptionsMultiError, or nil if none found.
+func (m *Options) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Options) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Text
+
+	// no validation rules for Score
+
+	if len(errors) > 0 {
+		return OptionsMultiError(errors)
+	}
+
+	return nil
+}
+
+// OptionsMultiError is an error wrapping multiple validation errors returned
+// by Options.ValidateAll() if the designated constraints aren't met.
+type OptionsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m OptionsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m OptionsMultiError) AllErrors() []error { return m }
+
+// OptionsValidationError is the validation error returned by Options.Validate
+// if the designated constraints aren't met.
+type OptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OptionsValidationError) ErrorName() string { return "OptionsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e OptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OptionsValidationError{}

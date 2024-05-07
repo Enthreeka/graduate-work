@@ -20,6 +20,7 @@ message Movie {
   repeated Similar similar = 10 [json_name = "similar"];
   repeated Writers writers = 11 [json_name = "writers"];
   repeated Cast cast = 12 [json_name = "cast"];
+  string trailer_yt = 13 [json_name = "trailer_yt"];
 }
 
 message Similar {

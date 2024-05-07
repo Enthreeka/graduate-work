@@ -31,3 +31,17 @@ message TotalHits {
   float max_score = 2 [json_name = "max_score"];
   repeated Hits hits = 3 [json_name = "hits"];
 }
+
+message Suggest {
+  repeated SimplePhrase simple_phrase = 1 [json_name = "simple_phrase"];
+}
+
+message SimplePhrase {
+  int64 length = 1 [json_name = "length"];
+  repeated Options options = 2 [json_name = "options"];
+}
+
+message Options {
+  string text = 1 [json_name = "text"];
+  float score = 2 [json_name = "score"];
+}

@@ -8,11 +8,13 @@ option go_package = "./;proto";
 
 message SearchMovieRequest {
   string query = 1 [json_name = "query"];
+  bool cache = 2 [json_name = "cache"];
 }
 
 message SearchMovieResponse {
   TotalHits hits = 1 [json_name = "hits"];
+  Suggest suggest = 2 [json_name = "suggest"];
 
   // Пишется в случаях, если был найден не точный запрос, а похожий
-  string status = 2 [json_name = "status"];
+  string status = 3 [json_name = "status"];
 }

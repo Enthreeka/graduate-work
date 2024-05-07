@@ -1,0 +1,42 @@
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "wildcard": {
+            "title": {
+              "value": "*Iro*",
+              "boost": 1.0,
+              "rewrite": "constant_score"
+            }
+          }
+        },
+        {
+        "match": {
+          "Name": {
+            "query" : "Iro",
+            "operator": "or",
+            "fuzziness": "auto"
+          }
+        }
+        }
+      ]
+    }
+  },
+  "suggest": {
+    "text": "Iro",
+    "simple_phrase": {
+      "phrase": {
+        "field": "title",
+        "size": 2,
+        "gram_size": 1,
+        "direct_generator": [
+          {
+            "field": "title",
+            "suggest_mode": "always"
+          }
+        ]
+      }
+    }
+  }
+}

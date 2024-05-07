@@ -1,0 +1,9 @@
+{
+  "GRPC": {
+    "addr": "localhost:9002"
+  },
+  "postgres": {
+    "docker_addr": "postgres://postgres:postgres@db:5432/movie",
+    "local_addr": "postgres://postgres:1234@localhost:5432/movie"
+  }
+}

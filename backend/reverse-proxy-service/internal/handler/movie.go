@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Enthreeka/reverse-proxy-service/internal/repo/redis"
 	"github.com/Enthreeka/reverse-proxy-service/pkg/logger"
+	"github.com/Enthreeka/reverse-proxy-service/pkg/utils"
 	pb "github.com/Entreeka/proto-proxy/go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -14,13 +15,15 @@ import (
 )
 
 const getMovieApi = "/v1/api/movie/get/"
+const searchMovieApi = "/v1/api/movie/search"
 
 type Handler struct {
 	pb.UnimplementedGatewayServer
 
-	Log           *logger.Logger
-	RedisRepo     redis.Repo
-	ClientElastic pb.GatewayClient
+	Log              *logger.Logger
+	RedisRepo        redis.Repo
+	ClientElastic    pb.GatewayClient
+	ClientAggregator pb.AggregatorClient
 }
 
 func SwitchToGrpcStatus(statusCode int, addInfo ...any) error {
@@ -138,21 +141,20 @@ func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (
 
 	h.Log.Info("SearchMovie: got message - %v", req.Query)
 
-	//movie, exist, err := h.RedisRepo.GetMovie(ctx, req.Query)
-	//if err != nil {
-	//	h.Log.Error("SearchMovie: failed to search movie in redis - error: %v, movie_exist: %v", err, exist)
-	//	return nil, SwitchToGrpcStatus(http.StatusInternalServerError, err)
-	//}
-	//if !exist {
-	response, err := h.ClientElastic.SearchMovie(ctx, req)
-	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("SearchMovie: error: %v, message: %s, ", err, s.Message())
-		return nil, err
+	redisKey := utils.KeyGenerator(searchMovieApi, req.Query)
+	isExist, err := h.RedisRepo.IsExist(ctx, redisKey)
+	if err != nil {
+		h.Log.Error("SearchMovie: failed to search movie in redis - error: %v, movie_exist: %v", err, isExist)
 	}
-	//} else {
-	//response.Movie = movie
-	//response.Status = "delivered from Redis"
-	//}
+	if !isExist || err != nil {
+		response, err = h.ClientElastic.SearchMovie(ctx, req)
+		if _, err := ErrorWrapper(err); err != nil {
+			h.Log.Error("SearchMovie: error: %v", err)
+			return nil, err
+		}
+	} else {
+		h.ClientAggregator.SearchMovieAggregator(ctx,&pb.)
+	}
 
 	return response, nil
 }

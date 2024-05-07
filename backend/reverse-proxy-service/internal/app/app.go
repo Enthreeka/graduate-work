@@ -13,7 +13,6 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"net/http"
-	"strings"
 )
 
 func Run(cfg *config.Config, log *logger.Logger) {
@@ -34,14 +33,24 @@ func Run(cfg *config.Config, log *logger.Logger) {
 		log.Fatal("failed to connect to clientElastic: %v", err)
 	}
 
+	clientAggregator := client.NewGrpcClient(log, cfg.GRPC.AggregatorService)
+
+	ca, err := clientAggregator.Connect()
+	if err != nil {
+		log.Fatal("failed to connect to clientAggregator: %v", err)
+	}
+
 	defer func() {
+		rds.Close()
+		clientAggregator.Close()
 		clientElastic.Close()
 	}()
 
 	h := handler.Handler{
-		Log:           log,
-		RedisRepo:     redisRepo,
-		ClientElastic: ce.(pb.GatewayClient),
+		Log:              log,
+		RedisRepo:        redisRepo,
+		ClientElastic:    ce.(pb.GatewayClient),
+		ClientAggregator: ca.(pb.GatewayClient),
 	}
 
 	mux := runtime.NewServeMux(
@@ -82,18 +91,4 @@ func Run(cfg *config.Config, log *logger.Logger) {
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal("failed to lister and server: %v", err)
 	}
-}
-
-var allowedHeaders = map[string]struct{}{
-	"x-request-id": {},
-}
-
-func isHeaderAllowed(s string) (string, bool) {
-	// check if allowedHeaders contain the header
-	if _, isAllowed := allowedHeaders[s]; isAllowed {
-		// send uppercase header
-		return strings.ToUpper(s), true
-	}
-	// if not in the allowed header, don't send the header
-	return s, false
 }

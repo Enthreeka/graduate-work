@@ -156,34 +156,67 @@ func (e *elasticRepo) QueryByDocumentID(ctx context.Context, documentID int) (*p
 func (e *elasticRepo) SearchIndex(ctx context.Context, query string) (*pb.SearchMovieResponse, error) {
 	var searchBuffer bytes.Buffer
 
+	//search := map[string]any{
+	//	"query": map[string]any{
+	//		"bool": map[string]any{
+	//			"should": []map[string]any{
+	//				{
+	//					"multi_match": map[string]any{
+	//						"query":     query,
+	//						"operator":  "and",
+	//						"fields":    e.searchFields,
+	//						"fuzziness": "auto",
+	//					},
+	//				},
+	//			},
+	//		},
+	//	},
+	//}
+
 	search := map[string]any{
 		"query": map[string]any{
 			"bool": map[string]any{
 				"should": []map[string]any{
 					{
 						"multi_match": map[string]any{
-							"query":     query,
-							"operator":  "and",
-							"fields":    e.searchFields,
-							"fuzziness": "auto",
+							"query":    query,
+							"operator": "and",
+							"fields":   e.searchFields,
+							//"fuzziness": "auto",
+						},
+					},
+					{
+						"wildcard": map[string]any{
+							"title": map[string]any{
+								"value":   "*" + query + "*",
+								"boost":   1.0,
+								"rewrite": "constant_score",
+							},
 						},
 					},
 					//{
-					//	"multi_match": map[string]any{
-					//		"query":  e.keyboardLayoutManager.GetOppositeLayoutWord(term),
-					//		"fields": e.searchFields,
+					//	"wildcard": map[string]any{
+					//		"cast.name": map[string]any{
+					//			"value":   "*" + query + "*",
+					//			"boost":   1.0,
+					//			"rewrite": "constant_score",
+					//		},
 					//	},
 					//},
 				},
-				//"must_not": []map[string]any{
-				//	{
-				//		"range": map[string]any{
-				//			"count_in_stock": map[string]any{
-				//				"lt": 1,
-				//			},
-				//		},
-				//	},
-				//},
+			},
+		},
+		"suggest": map[string]any{
+			"text": query,
+			"simple_phrase": map[string]any{
+				"phrase": map[string]any{
+					"field":     "title",
+					"size":      2,
+					"gram_size": 1,
+					"direct_generator": []map[string]any{
+						{"field": "title", "suggest_mode": "always"}},
+					//{"field": "cast", "suggest_mode": "always"}},
+				},
 			},
 		},
 	}

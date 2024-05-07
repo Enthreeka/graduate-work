@@ -152,8 +152,19 @@ func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (
 			h.Log.Error("SearchMovie: error: %v", err)
 			return nil, err
 		}
+		response.Status = "getting from elasticsearch-service"
 	} else {
-		h.ClientAggregator.SearchMovieAggregator(ctx,&pb.)
+		responseAggregator, err := h.ClientAggregator.SearchMovieAggregator(ctx, &pb.SearchMovieAggregatorRequest{
+			RedisKey: redisKey,
+			Query:    req.Query,
+		})
+		if _, err := ErrorWrapper(err); err != nil {
+			h.Log.Error("SearchMovie: error: %v", err)
+			return nil, err
+		}
+		response.Hits = responseAggregator.Hits
+		response.Suggest = responseAggregator.Suggest
+		response.Status = "getting from aggregator-service"
 	}
 
 	return response, nil

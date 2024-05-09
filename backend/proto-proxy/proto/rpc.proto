@@ -12,6 +12,10 @@ import "DeleteMovie.proto";
 import "BulkAPI.proto";
 
 import "SearchMovieAggregator.proto";
+import "SetCache.proto";
+import "GetCache.proto";
+import "CreateMoviePostgres.proto";
+
 
 
 import "google/api/annotations.proto";
@@ -78,4 +82,7 @@ service Gateway {
 
 service Aggregator {
   rpc SearchMovieAggregator(SearchMovieAggregatorRequest) returns (SearchMovieAggregatorResponse){}
+  rpc SetCache(SetCacheRequest) returns (SetCacheResponse){}
+  rpc GetCache(GetCacheRequest) returns (GetCacheResponse){}
+  rpc CreateMoviePostgres(CreateMoviePostgresRequest) returns (CreateMoviePostgresResponse){}
 }

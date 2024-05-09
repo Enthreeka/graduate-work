@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"github.com/Enthreeka/aggregator-service/internal/entity"
+	pb "github.com/Entreeka/proto-proxy/go"
 )
 
 type StorageRedis interface {
@@ -13,5 +14,7 @@ type StorageRedis interface {
 
 type StoragePostgres interface {
 	SearchByText(ctx context.Context, text string) ([]entity.Movie, error)
-	GetByArrID(ctx context.Context, id []int) ([]entity.Movie, error)
+	GetByArrID(ctx context.Context, id []int64) ([]*pb.Movie, error)
+	CreateMovie(ctx context.Context, id int64, title string, movie []byte) error
+	IfExistsMovie(ctx context.Context, id int64) (bool, error)
 }

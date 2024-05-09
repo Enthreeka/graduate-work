@@ -255,14 +255,6 @@ func (e *elasticRepo) SearchIndex(ctx context.Context, query string) (*pb.Search
 		return nil, fmt.Errorf("вывести ошибку о сериализации: %v", err)
 	}
 
-	//if searchResponse.Hits.Total.Value > 0 {
-	//	var testTitles []string
-	//	for _, testTitle := range searchResponse.Hits.Hits {
-	//		testTitles = append(testTitles, testTitle.Source.Title)
-	//	}
-	//	//fmt.Printf(strings.Join(testTitles, ","))
-	//}
-
 	return searchResponse, nil
 }
 
@@ -329,4 +321,40 @@ func (e *elasticRepo) GetIndexInfo(ctx context.Context, index []string) (map[str
 	}
 
 	return getResponse, nil
+}
+
+func (e *elasticRepo) QueryByDocumentIDs(ctx context.Context, documentIDs []int) (*pb.SearchMovieResponse, error) {
+	var buf bytes.Buffer
+	for _, id := range documentIDs {
+		fmt.Fprintf(&buf, `{"index":"%s"}`, indexMovie)
+		fmt.Fprintf(&buf, `{"query":{"term":{"document_id":%d}}}`, id)
+	}
+
+	response, err := e.elastic.Search(
+		e.elastic.Search.WithContext(ctx),
+		e.elastic.Search.WithIndex(indexMovie),
+		e.elastic.Search.WithBody(&buf),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		err := response.Body.Close()
+		if err != nil {
+			e.log.Error("failed to close elastic index response body: %v", err)
+		}
+	}()
+
+	if response.IsError() {
+		return nil, fmt.Errorf("error: %s", response.Status())
+	}
+
+	searchResponse := new(pb.SearchMovieResponse)
+	err = json.NewDecoder(response.Body).Decode(&searchResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return searchResponse, nil
 }

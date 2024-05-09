@@ -61,6 +61,8 @@ func (m *SearchMovieRequest) validate(all bool) error {
 
 	// no validation rules for Cache
 
+	// no validation rules for RedisKey
+
 	if len(errors) > 0 {
 		return SearchMovieRequestMultiError(errors)
 	}

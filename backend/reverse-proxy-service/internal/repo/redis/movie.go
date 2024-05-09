@@ -22,12 +22,12 @@ func NewRedisRepo(redis *redis.Redis) Repo {
 }
 
 func (r *redisRepo) IsExist(ctx context.Context, query string) (bool, error) {
-	isExist, err := r.Rds.Get(ctx, query).Bool()
+	_, err := r.Rds.Get(ctx, query).Result()
 	if errors.Is(err, rds.Nil) {
-		return isExist, nil
+		return false, nil
 	}
 	if err != nil {
-		return isExist, err
+		return true, err
 	}
-	return isExist, nil
+	return true, nil
 }

@@ -10,7 +10,6 @@ import (
 	"github.com/Enthreeka/reverse-proxy-service/pkg/redis"
 	pb "github.com/Entreeka/proto-proxy/go"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"net/http"
@@ -18,14 +17,6 @@ import (
 	"os/signal"
 	"syscall"
 )
-
-func NewGatewayClientWrapper(cc *grpc.ClientConn) interface{} {
-	return pb.NewGatewayClient(cc)
-}
-
-func NewAggregatorClientWrapper(cc *grpc.ClientConn) interface{} {
-	return pb.NewAggregatorClient(cc)
-}
 
 func Run(cfg *config.Config, log *logger.Logger) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
@@ -38,14 +29,14 @@ func Run(cfg *config.Config, log *logger.Logger) {
 
 	redisRepo := redisRepository.NewRedisRepo(rds)
 
-	clientElastic := client.NewGrpcClient(log, cfg.GRPC.ElasticsearchService, NewGatewayClientWrapper)
+	clientElastic := client.NewGrpcClient(log, cfg.GRPC.ElasticsearchService, client.NewGatewayClientWrapper)
 	ce, err := clientElastic.Connect()
 	if err != nil {
 		log.Fatal("failed to connect to clientElastic: %v", err)
 	}
 	clientElastic.Ping(ctx)
 
-	clientAggregator := client.NewGrpcClient(log, cfg.GRPC.AggregatorService, NewAggregatorClientWrapper)
+	clientAggregator := client.NewGrpcClient(log, cfg.GRPC.AggregatorService, client.NewAggregatorClientWrapper)
 	ca, err := clientAggregator.Connect()
 	if err != nil {
 		log.Fatal("failed to connect to clientAggregator: %v", err)

@@ -32,7 +32,8 @@ type (
 	}
 
 	GRPC struct {
-		Addr string `json:"addr"`
+		Addr              string `json:"addr"`
+		AggregatorService string `json:"aggregator_service"`
 	}
 )
 
@@ -57,7 +58,8 @@ func New() (*Config, error) {
 				Addr: jsonFile.Kibana.Addr,
 			},
 			GRPC: GRPC{
-				Addr: jsonFile.GRPC.Addr,
+				Addr:              jsonFile.GRPC.Addr,
+				AggregatorService: jsonFile.GRPC.AggregatorService,
 			},
 		},
 	}

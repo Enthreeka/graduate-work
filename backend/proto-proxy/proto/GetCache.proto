@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+option go_package = "./;proto";
+
+message GetCacheRequest{
+  string key = 1 [json_name = "key"];
+}
+
+
+message GetCacheResponse{
+  repeated int64 value = 1 [json_name = "valueCreateMoviePostgres"];
+}

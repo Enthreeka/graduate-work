@@ -7,6 +7,7 @@ import (
 	"github.com/Enthreeka/elasticsearch-service/internal/repo"
 	"github.com/Enthreeka/elasticsearch-service/internal/service"
 	"github.com/Enthreeka/elasticsearch-service/pkg/elasticsearch"
+	"github.com/Enthreeka/elasticsearch-service/pkg/grpc/client"
 	"github.com/Enthreeka/elasticsearch-service/pkg/logger"
 	pb "github.com/Entreeka/proto-proxy/go"
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
@@ -70,8 +71,15 @@ func (a *App) Run(log *logger.Logger, cfg *config.Config) {
 	log.Info("Connected to elasticsearch addr: %v", es.Transport.(*elastictransport.Client).URLs())
 	log.Info("Connected to kibana addr: [%s]", cfg.App.Kibana.Addr)
 
+	clientAggregator := client.NewGrpcClient(log, cfg.App.GRPC.AggregatorService, client.NewAggregatorClientWrapper)
+	ca, err := clientAggregator.Connect()
+	if err != nil {
+		log.Fatal("failed to connect to clientAggregator: %v", err)
+	}
+	clientAggregator.Ping(ctx)
+
 	a.elasticRepo = repo.NewElasticRepo(es, log, cfg.App.Elasticsearch.SearchFields)
-	a.elasticService = service.NewElasticService(a.elasticRepo)
+	a.elasticService = service.NewElasticService(a.elasticRepo, ca.(pb.AggregatorClient), log)
 
 	lis, err := net.Listen("tcp", cfg.App.GRPC.Addr)
 	if err != nil {

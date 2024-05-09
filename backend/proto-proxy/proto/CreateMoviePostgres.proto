@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+import "movie.proto";
+
+option go_package = "./;proto";
+
+message CreateMoviePostgresRequest {
+  repeated Movie movie = 1[json_name = "movie"];
+}
+
+message CreateMoviePostgresResponse {
+  string status = 1[json_name = "status"];
+}

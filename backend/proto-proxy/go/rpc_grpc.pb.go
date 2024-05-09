@@ -369,6 +369,9 @@ var Gateway_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	Aggregator_SearchMovieAggregator_FullMethodName = "/proxy_proto.Aggregator/SearchMovieAggregator"
+	Aggregator_SetCache_FullMethodName              = "/proxy_proto.Aggregator/SetCache"
+	Aggregator_GetCache_FullMethodName              = "/proxy_proto.Aggregator/GetCache"
+	Aggregator_CreateMoviePostgres_FullMethodName   = "/proxy_proto.Aggregator/CreateMoviePostgres"
 )
 
 // AggregatorClient is the client API for Aggregator service.
@@ -376,6 +379,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AggregatorClient interface {
 	SearchMovieAggregator(ctx context.Context, in *SearchMovieAggregatorRequest, opts ...grpc.CallOption) (*SearchMovieAggregatorResponse, error)
+	SetCache(ctx context.Context, in *SetCacheRequest, opts ...grpc.CallOption) (*SetCacheResponse, error)
+	GetCache(ctx context.Context, in *GetCacheRequest, opts ...grpc.CallOption) (*GetCacheResponse, error)
+	CreateMoviePostgres(ctx context.Context, in *CreateMoviePostgresRequest, opts ...grpc.CallOption) (*CreateMoviePostgresResponse, error)
 }
 
 type aggregatorClient struct {
@@ -395,11 +401,41 @@ func (c *aggregatorClient) SearchMovieAggregator(ctx context.Context, in *Search
 	return out, nil
 }
 
+func (c *aggregatorClient) SetCache(ctx context.Context, in *SetCacheRequest, opts ...grpc.CallOption) (*SetCacheResponse, error) {
+	out := new(SetCacheResponse)
+	err := c.cc.Invoke(ctx, Aggregator_SetCache_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aggregatorClient) GetCache(ctx context.Context, in *GetCacheRequest, opts ...grpc.CallOption) (*GetCacheResponse, error) {
+	out := new(GetCacheResponse)
+	err := c.cc.Invoke(ctx, Aggregator_GetCache_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *aggregatorClient) CreateMoviePostgres(ctx context.Context, in *CreateMoviePostgresRequest, opts ...grpc.CallOption) (*CreateMoviePostgresResponse, error) {
+	out := new(CreateMoviePostgresResponse)
+	err := c.cc.Invoke(ctx, Aggregator_CreateMoviePostgres_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AggregatorServer is the server API for Aggregator service.
 // All implementations must embed UnimplementedAggregatorServer
 // for forward compatibility
 type AggregatorServer interface {
 	SearchMovieAggregator(context.Context, *SearchMovieAggregatorRequest) (*SearchMovieAggregatorResponse, error)
+	SetCache(context.Context, *SetCacheRequest) (*SetCacheResponse, error)
+	GetCache(context.Context, *GetCacheRequest) (*GetCacheResponse, error)
+	CreateMoviePostgres(context.Context, *CreateMoviePostgresRequest) (*CreateMoviePostgresResponse, error)
 	mustEmbedUnimplementedAggregatorServer()
 }
 
@@ -409,6 +445,15 @@ type UnimplementedAggregatorServer struct {
 
 func (UnimplementedAggregatorServer) SearchMovieAggregator(context.Context, *SearchMovieAggregatorRequest) (*SearchMovieAggregatorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchMovieAggregator not implemented")
+}
+func (UnimplementedAggregatorServer) SetCache(context.Context, *SetCacheRequest) (*SetCacheResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCache not implemented")
+}
+func (UnimplementedAggregatorServer) GetCache(context.Context, *GetCacheRequest) (*GetCacheResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCache not implemented")
+}
+func (UnimplementedAggregatorServer) CreateMoviePostgres(context.Context, *CreateMoviePostgresRequest) (*CreateMoviePostgresResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateMoviePostgres not implemented")
 }
 func (UnimplementedAggregatorServer) mustEmbedUnimplementedAggregatorServer() {}
 
@@ -441,6 +486,60 @@ func _Aggregator_SearchMovieAggregator_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Aggregator_SetCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetCacheRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AggregatorServer).SetCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Aggregator_SetCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AggregatorServer).SetCache(ctx, req.(*SetCacheRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Aggregator_GetCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCacheRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AggregatorServer).GetCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Aggregator_GetCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AggregatorServer).GetCache(ctx, req.(*GetCacheRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Aggregator_CreateMoviePostgres_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateMoviePostgresRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AggregatorServer).CreateMoviePostgres(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Aggregator_CreateMoviePostgres_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AggregatorServer).CreateMoviePostgres(ctx, req.(*CreateMoviePostgresRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Aggregator_ServiceDesc is the grpc.ServiceDesc for Aggregator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -451,6 +550,18 @@ var Aggregator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchMovieAggregator",
 			Handler:    _Aggregator_SearchMovieAggregator_Handler,
+		},
+		{
+			MethodName: "SetCache",
+			Handler:    _Aggregator_SetCache_Handler,
+		},
+		{
+			MethodName: "GetCache",
+			Handler:    _Aggregator_GetCache_Handler,
+		},
+		{
+			MethodName: "CreateMoviePostgres",
+			Handler:    _Aggregator_CreateMoviePostgres_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

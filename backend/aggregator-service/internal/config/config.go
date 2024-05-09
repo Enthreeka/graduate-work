@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/joho/godotenv"
 	"os"
 )
 
@@ -16,6 +15,7 @@ type (
 	App struct {
 		GRPC     GRPC     `json:"GRPC"`
 		Postgres Postgres `json:"postgres"`
+		Redis    Redis    `json:"redis"`
 	}
 
 	Postgres struct {
@@ -26,14 +26,16 @@ type (
 	GRPC struct {
 		Addr string `json:"addr"`
 	}
+
+	Redis struct {
+		Password    string `json:"password"`
+		Host        string `json:"host"`
+		Db          int    `json:"db"`
+		MinIdleCons int    `json:"min_idle_cons"`
+	}
 )
 
 func New() (*Config, error) {
-	err := godotenv.Load("configs/app.env")
-	if err != nil {
-		return nil, err
-	}
-
 	jsonFile, err := NewDecoderJSON("configs/app.json")
 	if err != nil {
 		return nil, err
@@ -47,6 +49,12 @@ func New() (*Config, error) {
 			Postgres: Postgres{
 				LocalAddr:  jsonFile.Postgres.LocalAddr,
 				DockerAddr: jsonFile.Postgres.DockerAddr,
+			},
+			Redis: Redis{
+				Password:    jsonFile.Redis.Password,
+				Host:        jsonFile.Redis.Host,
+				Db:          jsonFile.Redis.Db,
+				MinIdleCons: jsonFile.Redis.MinIdleCons,
 			},
 		},
 	}

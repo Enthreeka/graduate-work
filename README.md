@@ -12,7 +12,7 @@
 | elasticsearch-service | ES           | 
 | proto-proxy           | PP           |
 | reverse-proxy-service | RPS          |
-
+| aggregator-service    | AS           |
 
 Пример:
 ```ES: update grpc interceptor in delivery/grpc/handler```

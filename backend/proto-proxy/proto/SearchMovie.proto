@@ -9,6 +9,7 @@ option go_package = "./;proto";
 message SearchMovieRequest {
   string query = 1 [json_name = "query"];
   bool cache = 2 [json_name = "cache"];
+  string redis_key = 3 [json_name = "redis_key"];
 }
 
 message SearchMovieResponse {

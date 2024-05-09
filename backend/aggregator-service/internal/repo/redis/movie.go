@@ -24,13 +24,14 @@ func NewRedisRepo(redis *redis.Redis) repo.StorageRedis {
 }
 
 func (r *redisRepo) Get(ctx context.Context, key string) ([]byte, error) {
-	val, err := r.Rds.Get(ctx, key).Result()
+	val, err := r.Rds.Get(ctx, key).Bytes()
 	if errors.Is(err, clientRedis.Nil) {
 		return nil, ErrNotFound
 	} else if err != nil {
 		return nil, err
 	}
-	return []byte(val), nil
+
+	return val, nil
 }
 
 func (r *redisRepo) Set(ctx context.Context, key string, value []byte) error {

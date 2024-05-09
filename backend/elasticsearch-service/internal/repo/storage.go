@@ -12,4 +12,5 @@ type Elastic interface {
 	SearchIndex(ctx context.Context, query string) (*pb.SearchMovieResponse, error)
 	QueryAllDataInIndex(ctx context.Context) (*pb.GetAllMovieResponse, error)
 	GetIndexInfo(ctx context.Context, index []string) (map[string]interface{}, error)
+	QueryByDocumentIDs(ctx context.Context, documentIDs []int) (*pb.SearchMovieResponse, error)
 }

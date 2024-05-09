@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+option go_package = "./;proto";
+
+message SetCacheRequest{
+  string key = 1 [json_name = "key"];
+  repeated int64 value = 2 [json_name = "value"];
+}
+
+
+message SetCacheResponse{}

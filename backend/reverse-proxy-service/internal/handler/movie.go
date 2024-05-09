@@ -6,6 +6,7 @@ import (
 	"github.com/Enthreeka/reverse-proxy-service/pkg/logger"
 	"github.com/Enthreeka/reverse-proxy-service/pkg/utils"
 	pb "github.com/Entreeka/proto-proxy/go"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -19,6 +20,7 @@ const searchMovieApi = "/v1/api/movie/search"
 
 type Handler struct {
 	pb.UnimplementedGatewayServer
+	pb.UnimplementedAggregatorServer
 
 	Log              *logger.Logger
 	RedisRepo        redis.Repo
@@ -139,17 +141,23 @@ func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (
 		return nil, SwitchToGrpcStatus(http.StatusBadRequest)
 	}
 
-	h.Log.Info("SearchMovie: got message - %v", req.Query)
+	h.Log.Info("SearchMovie: got message - %v", req)
 
 	redisKey := utils.KeyGenerator(searchMovieApi, req.Query)
 	isExist, err := h.RedisRepo.IsExist(ctx, redisKey)
 	if err != nil {
 		h.Log.Error("SearchMovie: failed to search movie in redis - error: %v, movie_exist: %v", err, isExist)
 	}
+
+	h.Log.Info("in redis - %v, key - %s", isExist, redisKey)
 	if !isExist || err != nil {
+		if req.Cache == true {
+			req.RedisKey = redisKey
+		}
+
 		response, err = h.ClientElastic.SearchMovie(ctx, req)
 		if _, err := ErrorWrapper(err); err != nil {
-			h.Log.Error("SearchMovie: error: %v", err)
+			h.Log.Error("SearchMovie: error in elasticsearch-service: %v", err)
 			return nil, err
 		}
 		response.Status = "getting from elasticsearch-service"
@@ -163,7 +171,6 @@ func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (
 			return nil, err
 		}
 		response.Hits = responseAggregator.Hits
-		response.Suggest = responseAggregator.Suggest
 		response.Status = "getting from aggregator-service"
 	}
 
@@ -206,12 +213,43 @@ func (h *Handler) DeleteMovie(ctx context.Context, req *pb.DeleteMovieRequest) (
 
 func (h *Handler) BulkAPI(ctx context.Context, req *pb.BulkAPIRequest) (*pb.BulkAPIResponse, error) {
 	response := new(pb.BulkAPIResponse)
+	var builder strings.Builder
 
-	response, err := h.ClientElastic.BulkAPI(ctx, req)
+	var g errgroup.Group
+	g.Go(func() error {
+		res, err := h.ClientElastic.BulkAPI(ctx, req)
+		if err != nil {
+			h.Log.Error("BulkAPI: error: %v", err)
+			return err
+		}
+
+		builder.WriteString("Elasticsearch-service: ")
+		builder.WriteString(res.Status)
+		builder.WriteString("|")
+		return nil
+	})
+
+	g.Go(func() error {
+		res, err := h.ClientAggregator.CreateMoviePostgres(ctx, &pb.CreateMoviePostgresRequest{
+			Movie: req.Movie,
+		})
+		if err != nil {
+			h.Log.Error("CreateMoviePostgres: error: %v", err)
+			return err
+		}
+
+		builder.WriteString("Aggregator-service: ")
+		builder.WriteString(res.Status)
+		builder.WriteString("|")
+		return nil
+	})
+
+	err := g.Wait()
 	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("BulkAPI: error: %v, message: %s, ", err, s.Message())
+		h.Log.Error("CreateMoviePostgres: error: %v, message: %s, ", err, s.Message())
 		return nil, err
 	}
 
+	response.Status = builder.String()
 	return response, nil
 }

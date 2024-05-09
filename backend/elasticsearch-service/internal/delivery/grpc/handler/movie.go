@@ -88,7 +88,7 @@ func (h *movieHandler) SearchMovie(ctx context.Context, req *pb.SearchMovieReque
 		return nil, HandleError(codes.InvalidArgument, errors.New("bad request: query is empty"))
 	}
 
-	response, err := h.elasticService.Search(ctx, req.Query)
+	response, err := h.elasticService.Search(ctx, req.Query, req.Cache, req.RedisKey)
 	if err != nil {
 		h.log.Error("SearchMovie: elasticService.Search: %v", err)
 		return nil, HandleError(codes.Internal, err)

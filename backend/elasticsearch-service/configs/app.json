@@ -9,6 +9,7 @@
     "addr": "http://localhost:5601"
   },
   "GRPC": {
-    "addr": "localhost:9001"
+    "addr": "localhost:9001",
+    "aggregator_service": "localhost:9002"
   }
 }

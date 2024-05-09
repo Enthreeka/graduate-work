@@ -15,7 +15,7 @@ import "SearchMovieAggregator.proto";
 import "SetCache.proto";
 import "GetCache.proto";
 import "CreateMoviePostgres.proto";
-
+import "SearchMoviePostgres.proto";
 
 
 import "google/api/annotations.proto";
@@ -85,4 +85,5 @@ service Aggregator {
   rpc SetCache(SetCacheRequest) returns (SetCacheResponse){}
   rpc GetCache(GetCacheRequest) returns (GetCacheResponse){}
   rpc CreateMoviePostgres(CreateMoviePostgresRequest) returns (CreateMoviePostgresResponse){}
+  rpc SearchMoviePostgres(SearchMoviePostgresRequest) returns (SearchMoviePostgresResponse){}
 }

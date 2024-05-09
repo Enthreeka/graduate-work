@@ -15,5 +15,4 @@ message SearchMovieAggregatorRequest{
 
 message SearchMovieAggregatorResponse{
   TotalHits hits = 1 [json_name = "hits"];
-  Suggest suggest = 2 [json_name = "suggest"];
 }

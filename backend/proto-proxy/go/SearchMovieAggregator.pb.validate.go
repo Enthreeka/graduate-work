@@ -193,35 +193,6 @@ func (m *SearchMovieAggregatorResponse) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetSuggest()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, SearchMovieAggregatorResponseValidationError{
-					field:  "Suggest",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, SearchMovieAggregatorResponseValidationError{
-					field:  "Suggest",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetSuggest()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return SearchMovieAggregatorResponseValidationError{
-				field:  "Suggest",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
 		return SearchMovieAggregatorResponseMultiError(errors)
 	}

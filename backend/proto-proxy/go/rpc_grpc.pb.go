@@ -372,6 +372,7 @@ const (
 	Aggregator_SetCache_FullMethodName              = "/proxy_proto.Aggregator/SetCache"
 	Aggregator_GetCache_FullMethodName              = "/proxy_proto.Aggregator/GetCache"
 	Aggregator_CreateMoviePostgres_FullMethodName   = "/proxy_proto.Aggregator/CreateMoviePostgres"
+	Aggregator_SearchMoviePostgres_FullMethodName   = "/proxy_proto.Aggregator/SearchMoviePostgres"
 )
 
 // AggregatorClient is the client API for Aggregator service.
@@ -382,6 +383,7 @@ type AggregatorClient interface {
 	SetCache(ctx context.Context, in *SetCacheRequest, opts ...grpc.CallOption) (*SetCacheResponse, error)
 	GetCache(ctx context.Context, in *GetCacheRequest, opts ...grpc.CallOption) (*GetCacheResponse, error)
 	CreateMoviePostgres(ctx context.Context, in *CreateMoviePostgresRequest, opts ...grpc.CallOption) (*CreateMoviePostgresResponse, error)
+	SearchMoviePostgres(ctx context.Context, in *SearchMoviePostgresRequest, opts ...grpc.CallOption) (*SearchMoviePostgresResponse, error)
 }
 
 type aggregatorClient struct {
@@ -428,6 +430,15 @@ func (c *aggregatorClient) CreateMoviePostgres(ctx context.Context, in *CreateMo
 	return out, nil
 }
 
+func (c *aggregatorClient) SearchMoviePostgres(ctx context.Context, in *SearchMoviePostgresRequest, opts ...grpc.CallOption) (*SearchMoviePostgresResponse, error) {
+	out := new(SearchMoviePostgresResponse)
+	err := c.cc.Invoke(ctx, Aggregator_SearchMoviePostgres_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AggregatorServer is the server API for Aggregator service.
 // All implementations must embed UnimplementedAggregatorServer
 // for forward compatibility
@@ -436,6 +447,7 @@ type AggregatorServer interface {
 	SetCache(context.Context, *SetCacheRequest) (*SetCacheResponse, error)
 	GetCache(context.Context, *GetCacheRequest) (*GetCacheResponse, error)
 	CreateMoviePostgres(context.Context, *CreateMoviePostgresRequest) (*CreateMoviePostgresResponse, error)
+	SearchMoviePostgres(context.Context, *SearchMoviePostgresRequest) (*SearchMoviePostgresResponse, error)
 	mustEmbedUnimplementedAggregatorServer()
 }
 
@@ -454,6 +466,9 @@ func (UnimplementedAggregatorServer) GetCache(context.Context, *GetCacheRequest)
 }
 func (UnimplementedAggregatorServer) CreateMoviePostgres(context.Context, *CreateMoviePostgresRequest) (*CreateMoviePostgresResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMoviePostgres not implemented")
+}
+func (UnimplementedAggregatorServer) SearchMoviePostgres(context.Context, *SearchMoviePostgresRequest) (*SearchMoviePostgresResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchMoviePostgres not implemented")
 }
 func (UnimplementedAggregatorServer) mustEmbedUnimplementedAggregatorServer() {}
 
@@ -540,6 +555,24 @@ func _Aggregator_CreateMoviePostgres_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Aggregator_SearchMoviePostgres_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchMoviePostgresRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AggregatorServer).SearchMoviePostgres(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Aggregator_SearchMoviePostgres_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AggregatorServer).SearchMoviePostgres(ctx, req.(*SearchMoviePostgresRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Aggregator_ServiceDesc is the grpc.ServiceDesc for Aggregator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -562,6 +595,10 @@ var Aggregator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMoviePostgres",
 			Handler:    _Aggregator_CreateMoviePostgres_Handler,
+		},
+		{
+			MethodName: "SearchMoviePostgres",
+			Handler:    _Aggregator_SearchMoviePostgres_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

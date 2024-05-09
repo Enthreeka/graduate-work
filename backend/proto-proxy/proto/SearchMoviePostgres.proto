@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proxy_proto;
+
+import "elasticsearch.proto";
+
+option go_package = "./;proto";
+
+message SearchMoviePostgresRequest {
+  string query = 1 [json_name = "query"];
+}
+
+message SearchMoviePostgresResponse {
+  TotalHits hits = 1 [json_name = "hits"];
+}

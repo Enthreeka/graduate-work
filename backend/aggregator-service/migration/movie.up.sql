@@ -17,3 +17,5 @@ CREATE TABLE IF NOT EXISTS movies (
     primary key (id)
 );
 
+
+SELECT movie FROM movies WHERE title ILIKE '%' || 'Pot' || '%';

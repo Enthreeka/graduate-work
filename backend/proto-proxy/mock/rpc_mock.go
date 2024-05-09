@@ -474,6 +474,26 @@ func (mr *MockAggregatorClientMockRecorder) SearchMovieAggregator(ctx, in any, o
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMovieAggregator", reflect.TypeOf((*MockAggregatorClient)(nil).SearchMovieAggregator), varargs...)
 }
 
+// SearchMoviePostgres mocks base method.
+func (m *MockAggregatorClient) SearchMoviePostgres(ctx context.Context, in *proto.SearchMoviePostgresRequest, opts ...grpc.CallOption) (*proto.SearchMoviePostgresResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SearchMoviePostgres", varargs...)
+	ret0, _ := ret[0].(*proto.SearchMoviePostgresResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchMoviePostgres indicates an expected call of SearchMoviePostgres.
+func (mr *MockAggregatorClientMockRecorder) SearchMoviePostgres(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMoviePostgres", reflect.TypeOf((*MockAggregatorClient)(nil).SearchMoviePostgres), varargs...)
+}
+
 // SetCache mocks base method.
 func (m *MockAggregatorClient) SetCache(ctx context.Context, in *proto.SetCacheRequest, opts ...grpc.CallOption) (*proto.SetCacheResponse, error) {
 	m.ctrl.T.Helper()
@@ -560,6 +580,21 @@ func (m *MockAggregatorServer) SearchMovieAggregator(arg0 context.Context, arg1 
 func (mr *MockAggregatorServerMockRecorder) SearchMovieAggregator(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMovieAggregator", reflect.TypeOf((*MockAggregatorServer)(nil).SearchMovieAggregator), arg0, arg1)
+}
+
+// SearchMoviePostgres mocks base method.
+func (m *MockAggregatorServer) SearchMoviePostgres(arg0 context.Context, arg1 *proto.SearchMoviePostgresRequest) (*proto.SearchMoviePostgresResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SearchMoviePostgres", arg0, arg1)
+	ret0, _ := ret[0].(*proto.SearchMoviePostgresResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchMoviePostgres indicates an expected call of SearchMoviePostgres.
+func (mr *MockAggregatorServerMockRecorder) SearchMoviePostgres(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMoviePostgres", reflect.TypeOf((*MockAggregatorServer)(nil).SearchMoviePostgres), arg0, arg1)
 }
 
 // SetCache mocks base method.

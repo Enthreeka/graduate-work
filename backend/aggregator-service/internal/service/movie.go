@@ -89,7 +89,6 @@ func (m *movieService) StorageMovie(ctx context.Context, movieArr []*pb.Movie) e
 	)
 
 	for _, movie := range movieArr {
-
 		isExist, err := m.postgresRepo.IfExistsMovie(ctx, movie.Id)
 		if err != nil {
 			return errors.Wrap(err, "failed to check if movie exists")
@@ -114,4 +113,31 @@ func (m *movieService) StorageMovie(ctx context.Context, movieArr []*pb.Movie) e
 
 	m.log.Info("StorageMovie: addedCount:%d, existsCount: %d", addedCount, existsCount)
 	return nil
+}
+
+func (m *movieService) SearchMovie(ctx context.Context, query string) (*pb.TotalHits, error) {
+	m.log.Info("SearchMovie: ")
+	movie, err := m.postgresRepo.SearchByText(ctx, query)
+	if err != nil {
+		m.log.Error("SearchMovie: %v", err)
+		return nil, errors.Wrap(err, "failed to get movie")
+	}
+
+	hits := make([]*pb.Hits, len(movie))
+	totalHits := &pb.TotalHits{
+		Hits: hits,
+	}
+	total := &pb.Total{}
+
+	for key, value := range movie {
+		hit := &pb.Hits{XSource: &pb.Movie{}}
+		hit.XSource = value
+
+		totalHits.Hits[key] = hit
+		total.Value++
+	}
+	totalHits.Total = total
+
+	m.log.Info("GetMovie - totalHits.Hits: %v", len(totalHits.Hits))
+	return totalHits, nil
 }

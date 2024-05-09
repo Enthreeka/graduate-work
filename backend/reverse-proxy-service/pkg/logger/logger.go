@@ -35,9 +35,13 @@ func (l *Logger) Fatal(format string, v ...any) {
 	l.sugarLogger.Fatalf(builder.String(), v...)
 }
 
-func New(serviceName string) *Logger {
+func New(serviceName string, isTesting bool) *Logger {
 	config := zap.NewDevelopmentConfig()
 	config.DisableStacktrace = true
+
+	if isTesting {
+		config.Level.SetLevel(zapcore.FatalLevel)
+	}
 
 	config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 
@@ -61,7 +65,7 @@ type Log interface {
 }
 
 var (
-	DefaultLogger Log = New("test")
+	DefaultLogger Log = New("test", false)
 )
 
 func Info(format string, v ...any) {

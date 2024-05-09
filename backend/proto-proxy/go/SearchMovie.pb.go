@@ -90,8 +90,7 @@ type SearchMovieResponse struct {
 
 	Hits    *TotalHits `protobuf:"bytes,1,opt,name=hits,proto3" json:"hits,omitempty"`
 	Suggest *Suggest   `protobuf:"bytes,2,opt,name=suggest,proto3" json:"suggest,omitempty"`
-	// Пишется в случаях, если был найден не точный запрос, а похожий
-	Status string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Status  string     `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 }
 
 func (x *SearchMovieResponse) Reset() {

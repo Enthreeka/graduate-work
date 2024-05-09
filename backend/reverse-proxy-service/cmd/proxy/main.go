@@ -9,7 +9,7 @@ import (
 const serviceName = "[REVERSE-PROXY] "
 
 func main() {
-	log := logger.New(serviceName)
+	log := logger.New(serviceName, false)
 	cfg, err := config.New()
 	if err != nil {
 		log.Fatal("failed to get config", err)

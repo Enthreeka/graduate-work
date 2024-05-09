@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"encoding/json"
-	"github.com/Enthreeka/aggregator-service/internal/entity"
 	"github.com/Enthreeka/aggregator-service/internal/repo"
 	"github.com/Enthreeka/aggregator-service/pkg/postgres"
 	pb "github.com/Entreeka/proto-proxy/go"
@@ -19,10 +18,10 @@ func NewPostgresRepo(pg *postgres.Postgres) repo.StoragePostgres {
 	}
 }
 
-func (p *postgresRepo) SearchByText(ctx context.Context, text string) ([]entity.Movie, error) {
+func (p *postgresRepo) SearchByText(ctx context.Context, text string) ([]*pb.Movie, error) {
 	q := `SELECT movie FROM movies WHERE title ILIKE '%' || $1 || '%'`
 
-	movies := make([]entity.Movie, 0)
+	movies := make([]*pb.Movie, 0)
 
 	rows, err := p.Pool.Query(ctx, q, text)
 	if err != nil {
@@ -36,11 +35,11 @@ func (p *postgresRepo) SearchByText(ctx context.Context, text string) ([]entity.
 			return nil, err
 		}
 
-		var movie entity.Movie
+		var movie pb.Movie
 		if err := json.Unmarshal(movieJSON, &movie); err != nil {
 			return nil, err
 		}
-		movies = append(movies, movie)
+		movies = append(movies, &movie)
 	}
 
 	if err := rows.Err(); err != nil {

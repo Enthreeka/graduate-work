@@ -15,7 +15,5 @@ message SearchMovieRequest {
 message SearchMovieResponse {
   TotalHits hits = 1 [json_name = "hits"];
   Suggest suggest = 2 [json_name = "suggest"];
-
-  // Пишется в случаях, если был найден не точный запрос, а похожий
   string status = 3 [json_name = "status"];
 }

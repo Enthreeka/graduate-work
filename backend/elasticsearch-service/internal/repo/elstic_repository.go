@@ -156,33 +156,16 @@ func (e *elasticRepo) QueryByDocumentID(ctx context.Context, documentID int) (*p
 func (e *elasticRepo) SearchIndex(ctx context.Context, query string) (*pb.SearchMovieResponse, error) {
 	var searchBuffer bytes.Buffer
 
-	//search := map[string]any{
-	//	"query": map[string]any{
-	//		"bool": map[string]any{
-	//			"should": []map[string]any{
-	//				{
-	//					"multi_match": map[string]any{
-	//						"query":     query,
-	//						"operator":  "and",
-	//						"fields":    e.searchFields,
-	//						"fuzziness": "auto",
-	//					},
-	//				},
-	//			},
-	//		},
-	//	},
-	//}
-
 	search := map[string]any{
 		"query": map[string]any{
 			"bool": map[string]any{
 				"should": []map[string]any{
 					{
 						"multi_match": map[string]any{
-							"query":    query,
-							"operator": "and",
-							"fields":   e.searchFields,
-							//"fuzziness": "auto",
+							"query":     query,
+							"operator":  "and",
+							"fields":    e.searchFields,
+							"fuzziness": 2,
 						},
 					},
 					{
@@ -194,15 +177,6 @@ func (e *elasticRepo) SearchIndex(ctx context.Context, query string) (*pb.Search
 							},
 						},
 					},
-					//{
-					//	"wildcard": map[string]any{
-					//		"cast.name": map[string]any{
-					//			"value":   "*" + query + "*",
-					//			"boost":   1.0,
-					//			"rewrite": "constant_score",
-					//		},
-					//	},
-					//},
 				},
 			},
 		},
@@ -215,7 +189,6 @@ func (e *elasticRepo) SearchIndex(ctx context.Context, query string) (*pb.Search
 					"gram_size": 1,
 					"direct_generator": []map[string]any{
 						{"field": "title", "suggest_mode": "always"}},
-					//{"field": "cast", "suggest_mode": "always"}},
 				},
 			},
 		},
@@ -250,7 +223,7 @@ func (e *elasticRepo) SearchIndex(ctx context.Context, query string) (*pb.Search
 	}
 
 	searchResponse := new(pb.SearchMovieResponse)
-	err = json.NewDecoder(response.Body).Decode(&searchResponse) // Replace
+	err = json.NewDecoder(response.Body).Decode(&searchResponse)
 	if err != nil {
 		return nil, fmt.Errorf("вывести ошибку о сериализации: %v", err)
 	}

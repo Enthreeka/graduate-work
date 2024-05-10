@@ -138,6 +138,6 @@ func (m *movieService) SearchMovie(ctx context.Context, query string) (*pb.Total
 	}
 	totalHits.Total = total
 
-	m.log.Info("GetMovie - totalHits.Hits: %v", len(totalHits.Hits))
+	m.log.Info("GetMovie - totalHits.Hits: %d", totalHits.Total.Value)
 	return totalHits, nil
 }

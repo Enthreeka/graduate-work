@@ -42,8 +42,12 @@ func (e *elasticService) Search(ctx context.Context, query string, cache bool, r
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to search index")
 	}
-	if searchResponse == nil || searchResponse.Hits.Total.Value == 0 {
-		return nil, errors.New("no response from search")
+	if searchResponse == nil {
+		return &pb.SearchMovieResponse{}, nil
+	}
+
+	if searchResponse.Hits.Total.Value == 0 && len(searchResponse.Suggest.SimplePhrase) != 0 {
+		return searchResponse, nil
 	}
 
 	if cache == true {

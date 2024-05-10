@@ -94,11 +94,6 @@ func (h *movieHandler) SearchMovie(ctx context.Context, req *pb.SearchMovieReque
 		return nil, HandleError(codes.Internal, err)
 	}
 
-	if response.Hits.Total.Value == 0 {
-		h.log.Error("SearchMovie: hits.Total.Value == 0, query: %s", req.Query)
-		return nil, HandleError(codes.NotFound, errors.New("movie not found"))
-	}
-
 	h.log.Info("SearchMovie: hits.Total.Value: %d, query: %s", response.Hits.Total.Value, req.Query)
 	return response, nil
 }

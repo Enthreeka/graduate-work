@@ -10,4 +10,5 @@ type AggregateService interface {
 	GetDataRedis(ctx context.Context, key string) ([]int64, error)
 	GetMovie(ctx context.Context, id []int64) (*pb.TotalHits, error)
 	StorageMovie(ctx context.Context, movieArr []*pb.Movie) error
+	SearchMovie(ctx context.Context, query string) (*pb.TotalHits, error)
 }

@@ -25,6 +25,22 @@ func NewHandler(log *logger.Logger, movieService service.AggregateService) *hand
 	}
 }
 
+// SearchMoviePostgres - резервный поиск по PostgreSQL, если не работает elasticsearch-service
+func (h *handler) SearchMoviePostgres(ctx context.Context, req *pb.SearchMoviePostgresRequest) (*pb.SearchMoviePostgresResponse, error) {
+	h.log.Info("SearchMoviePostgres called: %v", req)
+
+	totalHits, err := h.movieService.SearchMovie(ctx, req.Query)
+	if err != nil {
+		h.log.Error("SearchMoviePostgres SearchMovie: %v", err)
+		return nil, err
+	}
+
+	return &pb.SearchMoviePostgresResponse{
+		Hits: totalHits,
+	}, nil
+}
+
+// SearchMovieAggregator - главный механизм для получения кеша. proxy->aggregator[Redis->Postgres]->proxy
 func (h *handler) SearchMovieAggregator(ctx context.Context, req *pb.SearchMovieAggregatorRequest) (*pb.SearchMovieAggregatorResponse, error) {
 	h.log.Info("SearchMovieAggregator called: %v", req)
 

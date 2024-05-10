@@ -150,18 +150,42 @@ func (h *Handler) SearchMovie(ctx context.Context, req *pb.SearchMovieRequest) (
 	}
 
 	h.Log.Info("in redis - %v, key - %s", isExist, redisKey)
+	// Проверка на наличие кэша в Redis
 	if !isExist || err != nil {
 		if req.Cache == true {
 			req.RedisKey = redisKey
 		}
-
+		// В случае отсутствия в кэше идет поиск в Elasticsearch
 		response, err = h.ClientElastic.SearchMovie(ctx, req)
-		if _, err := ErrorWrapper(err); err != nil {
+		if s, err := ErrorWrapper(err); err != nil {
+			if s.Code() == codes.Unavailable {
+				h.Log.Info("Searching in aggregator...")
+
+				// Если elasticsearch-service недоступен, то ищем в PostgreSQL в aggregator-service
+				responsePostgres, err := h.aggregatorSearch(ctx, req.Query)
+				if _, err := ErrorWrapper(err); err != nil {
+					h.Log.Error("SearchMovie in postgres: error: %v", err)
+					return nil, err
+				}
+
+				if responsePostgres.Hits.Total.Value == 0 || responsePostgres.GetHits() == nil {
+					h.Log.Error("empty response from aggregator")
+					return nil, SwitchToGrpcStatus(http.StatusBadRequest)
+				}
+
+				return &pb.SearchMovieResponse{
+					Hits:   responsePostgres.Hits,
+					Status: "received from the backup storage - PostgreSQL",
+				}, nil
+			}
+
 			h.Log.Error("SearchMovie: error in elasticsearch-service: %v", err)
 			return nil, err
 		}
 		response.Status = "getting from elasticsearch-service"
 	} else {
+		// В случае наличия кеша, отправляемся в aggregator-service, где сначала получим значения из кеша,
+		// потом будем искать через where id = $1 в PostgreSQL
 		responseAggregator, err := h.ClientAggregator.SearchMovieAggregator(ctx, &pb.SearchMovieAggregatorRequest{
 			RedisKey: redisKey,
 			Query:    req.Query,

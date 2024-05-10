@@ -1,0 +1,3 @@
+
+banch:
+	go test -bench=.

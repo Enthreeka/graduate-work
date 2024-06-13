@@ -24,7 +24,7 @@ func main() {
 		url:      "http://localhost:8080/v1/api/movie/search",
 		method:   http.MethodGet,
 		duration: 2 * time.Minute,
-		rate:     vegeta.Rate{Freq: 200, Per: time.Second},
+		rate:     vegeta.Rate{Freq: 1000, Per: time.Second},
 		attacker: vegeta.NewAttacker(),
 		query:    []string{"harry", "iron", "harr", "what is it", "road"},
 		metrics:  metrics,
@@ -49,14 +49,14 @@ func Attacker(v vegetaSettings) {
 			Method: v.method,
 			URL:    v.url + "?" + "query=" + v.query[2],
 		},
-		vegeta.Target{
-			Method: v.method,
-			URL:    v.url + "?" + "query=" + v.query[3],
-		},
-		vegeta.Target{
-			Method: v.method,
-			URL:    v.url + "?" + "query=" + v.query[4] + "&" + "cache=" + "true",
-		},
+		//vegeta.Target{
+		//	Method: v.method,
+		//	URL:    v.url + "?" + "query=" + v.query[3],
+		//},
+		//vegeta.Target{
+		//	Method: v.method,
+		//	URL:    v.url + "?" + "query=" + v.query[4] + "&" + "cache=" + "true",
+		//},
 	)
 
 	for res := range v.attacker.Attack(targeter, v.rate, v.duration, "Big Bang!") {
@@ -67,7 +67,7 @@ func Attacker(v vegetaSettings) {
 func MetricsInfo(metrics *vegeta.Metrics) {
 	fmt.Println("Request count:", metrics.Requests)
 	fmt.Println("Time:", metrics.Duration)
-	fmt.Println("Success rate:", metrics.Rate, "%")
+	fmt.Println("Success rate:", metrics.Success, "%")
 	fmt.Println("Errors:", metrics.Errors)
 	fmt.Println("Average latency:", metrics.Latencies.Mean)
 	fmt.Println("95th percentile:", metrics.Latencies.P95)

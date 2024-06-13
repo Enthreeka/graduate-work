@@ -7,9 +7,11 @@
     "local_addr": "postgres://postgres:postgres@localhost:5435/movie"
   },
   "redis": {
-    "password": "",
+    "password": "secretp44ssword_",
     "host": ":6379",
     "db": 0,
     "min_idle_cons": 5
   }
 }
+
+

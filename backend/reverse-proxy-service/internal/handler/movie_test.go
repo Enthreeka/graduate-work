@@ -100,7 +100,7 @@ func BenchmarkDatabaseSearch_Test(b *testing.B) {
 
 		b.ResetTimer()
 		for n := 0; n < b.N; n++ {
-			req := &pb.SearchMovieRequest{Query: "harr potr"}
+			req := &pb.SearchMovieRequest{Query: "harry potter"}
 			_, err = h.SearchMovie(ctx, req)
 			if err != nil {
 				b.Error(err)
@@ -132,7 +132,7 @@ func BenchmarkDatabaseSearch_Test(b *testing.B) {
 
 		b.ResetTimer()
 		for n := 0; n < b.N; n++ {
-			req := &pb.SearchMovieRequest{Query: "harr potr"}
+			req := &pb.SearchMovieRequest{Query: "harry potter"}
 			_, err = h.SearchMovie(ctx, req)
 			if err != nil {
 				b.Error(err)

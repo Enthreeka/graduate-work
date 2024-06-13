@@ -27,3 +27,4 @@ COPY --from=builder /app/main /app/main
 COPY configs/app.env /app/configs/proxy.env
 
 CMD ["./main"]
+

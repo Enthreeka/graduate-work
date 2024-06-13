@@ -52,12 +52,14 @@ func (e *elasticService) Search(ctx context.Context, query string, cache bool, r
 
 	if cache == true {
 		go func(response *pb.SearchMovieResponse) {
-			valueArr := make([]int64, response.Hits.Total.Value)
+			valueArr := make([]int64, len(response.Hits.Hits))
 			for key, movie := range response.Hits.Hits {
 				if movie.GetXSource() == nil {
 					e.log.Error("source field not found in response: %s", movie.XId)
 					continue
 				}
+
+				e.log.Info("XSource = %d; xid = %s", movie.GetXSource().Id, movie.XId)
 				valueArr[key] = movie.GetXSource().Id
 			}
 

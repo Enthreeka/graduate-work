@@ -1,0 +1,13 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /Users/smirnovn/go-workspace/university/graduate-work/backend/logfile.log
+    fields:
+      log_type: application
+
+output.elasticsearch:
+  index_management:
+    policy: create
+  hosts: ["localhost:9200"]
+  index: "services"

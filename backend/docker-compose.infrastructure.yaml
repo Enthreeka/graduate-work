@@ -51,30 +51,6 @@ services:
         condition: service_healthy
     restart: always
 
-#  apm-server:
-#    image: elastic/apm-server:8.13.0
-#    depends_on:
-#      elasticsearch:
-#        condition: service_healthy
-#      kibana:
-#        condition: service_healthy
-#    cap_add: [ "CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID" ]
-#    cap_drop: [ "ALL" ]
-#    ports:
-#      - 8200:8200
-#    command: >
-#      apm-server -e
-#        -E apm-server.rum.enabled=true
-#        -E setup.kibana.host=kibana:5601
-#        -E setup.template.settings.index.number_of_replicas=0
-#        -E apm-server.kibana.enabled=true
-#        -E apm-server.kibana.host=kibana:5601
-#        -E output.elasticsearch.hosts=["elasticsearch:9200"]
-#    healthcheck:
-#      interval: 10s
-#      retries: 12
-#      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
-
   redis:
     image: redis
     ports:
@@ -99,5 +75,46 @@ services:
       retries: 10
       start_period: 30s
 
+  filebeat:
+    labels:
+      co.elastic.logs/enabled: false
+    user: root
+    image: elastic/filebeat:8.11.0
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./filebeat:/usr/share/filebeat/filebeat.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
 volumes:
   postgres_data:
+
+  # FOR METRICS
+  #  apm-server:
+  #    image: elastic/apm-server:8.13.0
+  #    depends_on:
+  #      elasticsearch:
+  #        condition: service_healthy
+  #      kibana:
+  #        condition: service_healthy
+  #    cap_add: [ "CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID" ]
+  #    cap_drop: [ "ALL" ]
+  #    ports:
+  #      - 8200:8200
+  #    command: >
+  #      apm-server -e
+  #        -E apm-server.rum.enabled=true
+  #        -E setup.kibana.host=kibana:5601
+  #        -E setup.template.settings.index.number_of_replicas=0
+  #        -E apm-server.kibana.enabled=true
+  #        -E apm-server.kibana.host=kibana:5601
+  #        -E output.elasticsearch.hosts=["elasticsearch:9200"]
+  #    healthcheck:
+  #      interval: 10s
+  #      retries: 12
+  #      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/

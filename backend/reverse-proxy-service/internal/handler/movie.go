@@ -269,8 +269,8 @@ func (h *Handler) BulkAPI(ctx context.Context, req *pb.BulkAPIRequest) (*pb.Bulk
 	})
 
 	err := g.Wait()
-	if s, err := ErrorWrapper(err); err != nil {
-		h.Log.Error("CreateMoviePostgres: error: %v, message: %s, ", err, s.Message())
+	if _, err := ErrorWrapper(err); err != nil {
+		h.Log.Error("CreateMoviePostgres: error: %v, success service: %s, ", err, builder.String())
 		return nil, err
 	}
 

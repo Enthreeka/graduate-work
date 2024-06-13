@@ -1,0 +1,44 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+autonumber
+
+box "Алгоритм резервного хранилища данных"
+
+participant "Клиент" as cl
+participant "Прокси сервис" as proxy
+participant "Поисковый сервис" as search
+participant "Сервис агрегации запросов" as agregator
+participant "PostgreSQL" as postgres
+
+cl -> proxy: POST /v1/api/movie/search?query=&cache=
+activate cl
+
+proxy -> search: Запрос с query
+activate proxy
+activate search
+
+search --> proxy: Массив сущности []pb.Movie, статус код
+deactivate search
+
+opt 500 статус код
+
+proxy -> agregator: Запрос с query
+activate agregator
+
+agregator -> postgres: Поиск по title через WHERE title ILIKE '%' || $1 || '%'
+activate postgres
+
+postgres --> agregator: Массив сущности []pb.Movie
+deactivate postgres
+
+agregator-->proxy: Массив сущности []pb.Movie
+
+deactivate agregator
+end
+
+proxy-->cl: HTTP Status, JSON
+
+
+@enduml

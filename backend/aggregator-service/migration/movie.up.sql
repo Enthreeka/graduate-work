@@ -16,6 +16,3 @@ CREATE TABLE IF NOT EXISTS movies (
     movie JSON,
     primary key (id)
 );
-
-
-SELECT movie FROM movies WHERE title ILIKE '%' || 'Pot' || '%';

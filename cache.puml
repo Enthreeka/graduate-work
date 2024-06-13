@@ -1,0 +1,88 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+autonumber
+
+box "Алгоритм кеширования"
+
+participant "Клиент" as cl
+participant "Прокси сервис" as proxy
+participant "Сервис агрегации запросов" as agregator
+participant "PostgreSQL" as postgres
+participant "Redis" as redis
+participant "Поисковый сервис" as search
+participant "Elisticsearch" as elastic
+
+cl -> proxy: POST /v1/api/movie/search?query=&cache=
+activate proxy
+activate cl
+
+proxy -> redis: Поиск по ключу api+query
+activate redis
+
+redis --> proxy: Ответ с данными
+deactivate redis
+
+alt Запрос найден в Redis
+
+proxy -> agregator: Запрос с ключом api+query
+activate agregator
+
+agregator -> redis: Поиск по ключу api+query
+activate redis
+
+redis --> agregator: Массив с id элементов []int64
+deactivate redis
+
+agregator -> postgres: Поиск по id через WHERE id = ANY($1)
+activate postgres
+
+postgres --> agregator: Массив сущности []pb.Movie
+deactivate postgres
+
+agregator --> proxy: Массив сущности []pb.Movie
+deactivate agregator
+
+proxy --> cl: HTTP Status, JSON
+
+else Запрос не найден в Redis
+
+proxy -> search: Запрос с query
+activate search
+
+search -> elastic: Поиск по значению query
+activate elastic
+
+
+alt Запрос найден в Elisticsearch
+
+elastic --> search: Массив сущности []pb.Movie
+
+opt Cache из запроса true
+search -> redis: Создать пару api+query:[]int64
+activate redis
+deactivate redis
+end
+
+search --> proxy: Массив сущности []pb.Movie
+
+proxy --> cl: HTTP Status, JSON
+
+else Запрос не найден в Elisticsearch
+
+elastic --> search: Пустой массив сущности []pb.Movie
+
+search --> proxy: Пустой массив сущности []pb.Movie
+
+proxy --> cl: HTTP Status, JSON
+
+
+deactivate search
+deactivate elastic
+
+
+end
+end
+
+@enduml

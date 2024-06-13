@@ -3,6 +3,7 @@ package logger
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 	"strings"
 )
 
@@ -12,11 +13,11 @@ type Logger struct {
 }
 
 func (l *Logger) Info(format string, v ...any) {
-	var builder strings.Builder
-	builder.WriteString(l.serviceName)
-	builder.WriteString(format)
+	//var builder strings.Builder
+	//builder.WriteString(l.serviceName)
+	//builder.WriteString(format)
 
-	l.sugarLogger.Infof(builder.String(), v...)
+	l.sugarLogger.Infof(format, v...)
 }
 
 func (l *Logger) Error(format string, v ...any) {
@@ -36,27 +37,57 @@ func (l *Logger) Fatal(format string, v ...any) {
 }
 
 func New(serviceName string, isTesting bool) *Logger {
-	config := zap.NewDevelopmentConfig()
-	config.DisableStacktrace = true
+	consoleConfig := zap.NewDevelopmentConfig()
+	consoleConfig.DisableStacktrace = true
+	consoleConfig.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+	consoleConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	consoleConfig.EncoderConfig.EncodeTime = zapcore.RFC3339TimeEncoder
+
+	fileConfig := zap.NewDevelopmentConfig()
+	fileConfig.DisableStacktrace = true
+	fileConfig.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+	fileConfig.EncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+	fileConfig.EncoderConfig.EncodeTime = zapcore.RFC3339TimeEncoder
+	fileConfig.Encoding = "json"
+	fileConfig.OutputPaths = []string{"/Users/smirnovn/go-workspace/university/graduate-work/backend/logfile.log"}
 
 	if isTesting {
-		config.Level.SetLevel(zapcore.FatalLevel)
+		consoleConfig.Level.SetLevel(zapcore.FatalLevel)
+		fileConfig.Level.SetLevel(zapcore.FatalLevel)
 	}
 
-	config.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+	consoleCore := zapcore.NewCore(
+		zapcore.NewConsoleEncoder(consoleConfig.EncoderConfig),
+		os.Stdout,
+		consoleConfig.Level,
+	)
 
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	config.EncoderConfig.EncodeTime = zapcore.RFC3339TimeEncoder
+	fileCore := zapcore.NewCore(
+		zapcore.NewJSONEncoder(fileConfig.EncoderConfig),
+		zapcore.AddSync(openFileOrDie(fileConfig.OutputPaths[0])),
+		fileConfig.Level,
+	)
 
-	logger, _ := config.Build(zap.AddCallerSkip(1))
+	core := zapcore.NewTee(consoleCore, fileCore)
+
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+
+	logger = logger.Named(serviceName)
 	sugarLogger := logger.Sugar()
 
-	log := &Logger{
+	l := &Logger{
 		sugarLogger: sugarLogger,
-		serviceName: serviceName,
 	}
 
-	return log
+	return l
+}
+
+func openFileOrDie(path string) zapcore.WriteSyncer {
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+	return zapcore.AddSync(file)
 }
 
 type Log interface {

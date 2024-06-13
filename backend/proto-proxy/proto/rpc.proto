@@ -25,58 +25,49 @@ import "google/api/annotations.proto";
 option go_package = "./;proto";
 
 service Gateway {
-
   rpc GetAllMovie(GetAllMovieRequest) returns (GetAllMovieResponse){
     option (google.api.http) = {
       get: "/v1/api/movie/all"
     };
   }
-
   rpc CreateNewMovie(CreateNewMovieRequest) returns (CreateNewMovieResponse){
     option (google.api.http) = {
       post: "/v1/api/movie/create",
       body: "*"
     };
   }
-
   rpc GetIndices(GetIndicesRequest) returns (GetIndicesResponse){
     option (google.api.http) = {
       get: "/v1/api/movie/indices",
     };
   }
-
   rpc GetMovieByID(GetMovieByIDRequest) returns (GetMovieByIDResponse){
     option (google.api.http) = {
       get: "/v1/api/movie/get/{movie_id}",
     };
   }
-
   rpc SearchMovie(SearchMovieRequest) returns (SearchMovieResponse){
     option (google.api.http) = {
       get: "/v1/api/movie/search",
     };
   }
-
   rpc UpdateMovieData(UpdateMovieDataRequest) returns (UpdateMovieDataResponse){
     option (google.api.http) = {
       patch: "/v1/api/movie/update/{movie_id}",
       body: "*"
     };
   }
-
   rpc DeleteMovie(DeleteMovieRequest) returns (DeleteMovieResponse){
     option (google.api.http) = {
       delete: "/v1/api/movie/delete",
     };
   }
-
   rpc BulkAPI(BulkAPIRequest) returns (BulkAPIResponse){
     option (google.api.http) = {
       post: "/v1/api/movie/bulk",
       body: "*"
     };
   }
-
 }
 
 

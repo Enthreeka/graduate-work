@@ -1,0 +1,17 @@
+{
+  "HTTP": {
+    "addr": "localhost:8080"
+  },
+  "GRPC": {
+    "aggregator-service": "localhost:9002",
+    "elasticsearch-service": "localhost:9001"
+  },
+  "redis": {
+    "password": "secretp44ssword_",
+    "host": ":6379",
+    "db": 0,
+    "min_idle_cons": 5
+  }
+}
+
+

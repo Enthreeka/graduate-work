@@ -8,9 +8,10 @@ import (
 
 type (
 	Config struct {
-		Redis   Redis   `json:"redis"`
-		GRPC    GRPC    `json:"grpc"`
-		Gateway Gateway `json:"gateway"`
+		Redis      Redis      `json:"redis"`
+		GRPC       GRPC       `json:"grpc"`
+		Gateway    Gateway    `json:"gateway"`
+		Prometheus Prometheus `json:"prometheus"`
 	}
 
 	GRPC struct {
@@ -23,6 +24,7 @@ type (
 		Hostname   string `json:"hostname"`
 		Port       string `json:"port"`
 		TypeServer string `json:"type_server"`
+		ServerName string `json:"server_name"`
 	}
 
 	Redis struct {
@@ -30,6 +32,10 @@ type (
 		Host        string `json:"host"`
 		Db          int    `json:"db"`
 		MinIdleCons int    `json:"min_idle_cons"`
+	}
+
+	Prometheus struct {
+		Address string `json:"address"`
 	}
 )
 
@@ -41,7 +47,8 @@ func New() (*Config, error) {
 
 	config := &Config{
 		Gateway: Gateway{
-			Port: os.Getenv("PORT_GATEWAY"),
+			Port:       os.Getenv("PORT_GATEWAY"),
+			ServerName: os.Getenv("SERVER_NAME"),
 		},
 		GRPC: GRPC{
 			ElasticsearchService: os.Getenv("ELASTICSEARCH_SERVICE"),
@@ -52,6 +59,9 @@ func New() (*Config, error) {
 			Host:        os.Getenv("HOST_REDIS"),
 			Db:          parseEnvInt(os.Getenv("DB_REDIS")),
 			MinIdleCons: parseEnvInt(os.Getenv("MIN_IDLE_CONS_REDIS")),
+		},
+		Prometheus: Prometheus{
+			Address: os.Getenv("PROMETHEUS_ADDRESS"),
 		},
 	}
 

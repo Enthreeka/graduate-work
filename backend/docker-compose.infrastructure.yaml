@@ -1,4 +1,5 @@
 services:
+
   elasticsearch:
     image: elasticsearch:8.11.0
     container_name: elasticsearch
@@ -39,18 +40,6 @@ services:
       retries: 20
       interval: 5s
 
-  logstash:
-    image: logstash:8.11.0
-    container_name: logstash
-    volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-    ports:
-      - "5000:5000"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    restart: always
-
   redis:
     image: redis
     ports:
@@ -75,24 +64,58 @@ services:
       retries: 10
       start_period: 30s
 
-  filebeat:
-    labels:
-      co.elastic.logs/enabled: false
-    user: root
-    image: elastic/filebeat:8.11.0
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kibana:
-        condition: service_healthy
-    command: filebeat -e -strict.perms=false
+  prometheus:
+    container_name: prometheus_container
+    image: prom/prometheus
     volumes:
-      - ./filebeat:/usr/share/filebeat/filebeat.yaml
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - '9090:9090'
+
+  grafana:
+    container_name: grafana_container
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    depends_on:
+      - prometheus
 
 volumes:
   postgres_data:
+
+  #  filebeat:
+  #    labels:
+  #      co.elastic.logs/enabled: false
+  #    user: root
+  #    image: elastic/filebeat:8.11.0
+  #    depends_on:
+  #      elasticsearch:
+  #        condition: service_healthy
+  #      kibana:
+  #        condition: service_healthy
+  #    command: filebeat -e -strict.perms=false
+  #    volumes:
+  #      - ./filebeat:/usr/share/filebeat/filebeat.yaml
+  #      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  #  logstash:
+  #    image: logstash:8.11.0
+  #    container_name: logstash
+  #    volumes:
+  #      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+  #    ports:
+  #      - "5000:5000"
+  #    depends_on:
+  #      elasticsearch:
+  #        condition: service_healthy
+  #    restart: always
 
   # FOR METRICS
   #  apm-server:

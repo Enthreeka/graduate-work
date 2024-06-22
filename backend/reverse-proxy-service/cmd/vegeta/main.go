@@ -24,7 +24,7 @@ func main() {
 		url:      "http://localhost:8080/v1/api/movie/search",
 		method:   http.MethodGet,
 		duration: 2 * time.Minute,
-		rate:     vegeta.Rate{Freq: 1000, Per: time.Second},
+		rate:     vegeta.Rate{Freq: 100, Per: time.Second},
 		attacker: vegeta.NewAttacker(),
 		query:    []string{"harry", "iron", "harr", "what is it", "road"},
 		metrics:  metrics,

@@ -61,15 +61,12 @@ func (g *GatewayClient) Ping(ctx context.Context) {
 		for {
 			select {
 			case <-ctx.Done():
-				g.log.Error("context canceled while pinging grpc service")
+				g.log.Error("context canceled while pinging grpc service: %s", g.address)
 				return
-			default:
-				select {
-				case <-ticker.C:
-					state := g.connection.GetState()
-					if state != connectivity.Ready {
-						g.log.Error("grpc connection is not ready: [%s], state - %s", g.address, state.String())
-					}
+			case <-ticker.C:
+				state := g.connection.GetState()
+				if state != connectivity.Ready {
+					g.log.Error("grpc connection is not ready: [%s], state - %s", g.address, state.String())
 				}
 			}
 		}

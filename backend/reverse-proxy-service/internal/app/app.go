@@ -7,6 +7,7 @@ import (
 	redisRepository "github.com/Enthreeka/reverse-proxy-service/internal/repo/redis"
 	"github.com/Enthreeka/reverse-proxy-service/pkg/grpc/client"
 	"github.com/Enthreeka/reverse-proxy-service/pkg/logger"
+	"github.com/Enthreeka/reverse-proxy-service/pkg/metric"
 	"github.com/Enthreeka/reverse-proxy-service/pkg/redis"
 	pb "github.com/Entreeka/proto-proxy/go"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -21,6 +22,19 @@ import (
 func Run(cfg *config.Config, log *logger.Logger) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
+
+	//metrics, err := metric.CreateMetrics(cfg.Prometheus.Address, cfg.Gateway.ServerName)
+	//if err != nil {
+	//	log.Error("CreateMetrics Error: %s", err)
+	//}
+
+	go func() {
+		if err := metric.Listen(cfg.Prometheus.Address); err != nil {
+			log.Fatal("Failed to start metric server", err)
+		}
+	}()
+
+	log.Info("Metrics available URL: %s, ServiceName: %s", cfg.Prometheus.Address, cfg.Gateway.ServerName)
 
 	rds, err := redis.New(ctx, cfg.Redis.Host, cfg.Redis.Password, cfg.Redis.MinIdleCons, cfg.Redis.Db)
 	if err != nil {
@@ -49,12 +63,12 @@ func Run(cfg *config.Config, log *logger.Logger) {
 		clientElastic.Close()
 	}()
 
-	h := handler.Handler{
-		Log:              log,
-		RedisRepo:        redisRepo,
-		ClientElastic:    ce.(pb.GatewayClient),
-		ClientAggregator: ca.(pb.AggregatorClient),
-	}
+	h := handler.NewHandler(
+		log,
+		redisRepo,
+		ce.(pb.GatewayClient),
+		ca.(pb.AggregatorClient),
+	)
 
 	mux := runtime.NewServeMux(
 		//runtime.WithOutgoingHeaderMatcher(isHeaderAllowed),
@@ -80,7 +94,7 @@ func Run(cfg *config.Config, log *logger.Logger) {
 		}),
 	)
 
-	err = pb.RegisterGatewayHandlerServer(ctx, mux, &h)
+	err = pb.RegisterGatewayHandlerServer(ctx, mux, h)
 	if err != nil {
 		log.Fatal("RegisterGatewayHandlerServer: %v", err)
 	}

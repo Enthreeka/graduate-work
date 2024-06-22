@@ -4,78 +4,78 @@
 
 autonumber
 
-box "Алгоритм кеширования"
+box <size:18>"Алгоритм кеширования"
 
-participant "Клиент" as cl
-participant "Прокси сервис" as proxy
-participant "Сервис агрегации запросов" as agregator
-participant "PostgreSQL" as postgres
-participant "Redis" as redis
-participant "Поисковый сервис" as search
-participant "Elisticsearch" as elastic
+participant "<size:18>Клиент" as cl
+participant "<size:18>Прокси сервис" as proxy
+participant "<size:18>Сервис агрегации запросов" as agregator
+participant "<size:18>PostgreSQL" as postgres
+participant "<size:18>Redis" as redis
+participant "<size:18>Поисковый сервис" as search
+participant "<size:18>Elisticsearch" as elastic
 
-cl -> proxy: POST /v1/api/movie/search?query=&cache=
+cl -> proxy: <size:18>POST /v1/api/movie/search?query=&cache=</size>
 activate proxy
 activate cl
 
-proxy -> redis: Поиск по ключу api+query
+proxy -> redis: <size:18>Поиск по ключу api+query
 activate redis
 
-redis --> proxy: Ответ с данными
+redis --> proxy:  <size:18>Ответ с данными</size>
 deactivate redis
 
-alt Запрос найден в Redis
+alt <size:18>Запрос найден в Redis
 
-proxy -> agregator: Запрос с ключом api+query
+proxy -> agregator: <size:18>Запрос с ключом api+query
 activate agregator
 
-agregator -> redis: Поиск по ключу api+query
+agregator -> redis: <size:18>Поиск по ключу api+query
 activate redis
 
-redis --> agregator: Массив с id элементов []int64
+redis --> agregator: <size:18>Массив с id элементов []int64
 deactivate redis
 
-agregator -> postgres: Поиск по id через WHERE id = ANY($1)
+agregator -> postgres: <size:18>Поиск по id через WHERE id = ANY($1)
 activate postgres
 
-postgres --> agregator: Массив сущности []pb.Movie
+postgres --> agregator: <size:18>Массив сущности []pb.Movie
 deactivate postgres
 
-agregator --> proxy: Массив сущности []pb.Movie
+agregator --> proxy: <size:18>Массив сущности []pb.Movie
 deactivate agregator
 
-proxy --> cl: HTTP Status, JSON
+proxy --> cl: <size:18>HTTP Status, JSON
 
-else Запрос не найден в Redis
+else <size:18>Запрос не найден в Redis
 
-proxy -> search: Запрос с query
+proxy -> search: <size:18>Запрос с query
 activate search
 
-search -> elastic: Поиск по значению query
+search -> elastic: <size:18>Поиск по значению query
 activate elastic
 
 
-alt Запрос найден в Elisticsearch
+alt <size:18>Запрос найден в Elisticsearch
 
-elastic --> search: Массив сущности []pb.Movie
+elastic --> search: <size:18>Массив сущности []pb.Movie
 
-opt Cache из запроса true
-search -> redis: Создать пару api+query:[]int64
+opt <size:18>Cache из запроса true
+search -> redis: <size:18>Создать пару api+query:[]int64
 activate redis
 deactivate redis
 end
 
-search --> proxy: Массив сущности []pb.Movie
+search --> proxy: <size:18>Массив сущности []pb.Movie
 
-proxy --> cl: HTTP Status, JSON
+proxy --> cl: <size:18>HTTP Status, JSON
 
-else Запрос не найден в Elisticsearch
+else <size:18>Запрос не найден в Elisticsearch
 
-elastic --> search: Пустой массив сущности []pb.Movie
+elastic --> search: <size:18>Пустой массив сущности []pb.Movie
 
-search --> proxy: Пустой массив сущности []pb.Movie
+search --> proxy: <size:18>Пустой массив сущности []pb.Movie
 
-proxy --> cl: HTTP Status, JSON
+proxy --> cl: <size:18>HTTP Status, JSON
 
 
 deactivate search

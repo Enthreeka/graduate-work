@@ -33,11 +33,11 @@ func BenchmarkSearch_Test(b *testing.B) {
 		log.Fatal("failed to connect to clientElastic: %v", err)
 	}
 
-	h := Handler{
-		ClientElastic:    ce.(pb.GatewayClient),
-		ClientAggregator: ca.(pb.AggregatorClient),
-		Log:              log,
-		RedisRepo:        redisRepoMock,
+	h := handler{
+		clientElastic:    ce.(pb.GatewayClient),
+		clientAggregator: ca.(pb.AggregatorClient),
+		log:              log,
+		redisRepo:        redisRepoMock,
 	}
 
 	ctx := context.Background()
@@ -91,11 +91,11 @@ func BenchmarkDatabaseSearch_Test(b *testing.B) {
 			log.Fatal("failed to connect to clientElastic: %v", err)
 		}
 
-		h := Handler{
-			ClientElastic:    ce.(pb.GatewayClient),
-			ClientAggregator: ca.(pb.AggregatorClient),
-			Log:              log,
-			RedisRepo:        redisRepoMock,
+		h := handler{
+			clientElastic:    ce.(pb.GatewayClient),
+			clientAggregator: ca.(pb.AggregatorClient),
+			log:              log,
+			redisRepo:        redisRepoMock,
 		}
 
 		b.ResetTimer()
@@ -123,11 +123,11 @@ func BenchmarkDatabaseSearch_Test(b *testing.B) {
 			log.Fatal("failed to connect to clientElastic: %v", err)
 		}
 
-		h := Handler{
-			ClientElastic:    elasticMock,
-			ClientAggregator: ca.(pb.AggregatorClient),
-			Log:              log,
-			RedisRepo:        redisRepoMock,
+		h := handler{
+			clientElastic:    elasticMock,
+			clientAggregator: ca.(pb.AggregatorClient),
+			log:              log,
+			redisRepo:        redisRepoMock,
 		}
 
 		b.ResetTimer()
@@ -164,11 +164,11 @@ func TestSearchMovie(t *testing.T) {
 	ctx := context.Background()
 	redisRepoMock := redisMock.NewMockRepo(ctrl)
 
-	h := Handler{
-		ClientElastic:    ce.(pb.GatewayClient),
-		ClientAggregator: ca.(pb.AggregatorClient),
-		Log:              log,
-		RedisRepo:        redisRepoMock,
+	h := handler{
+		clientElastic:    ce.(pb.GatewayClient),
+		clientAggregator: ca.(pb.AggregatorClient),
+		log:              log,
+		redisRepo:        redisRepoMock,
 	}
 
 	t.Run("Searching in database", func(t *testing.T) {
@@ -185,11 +185,11 @@ func TestSearchMovie(t *testing.T) {
 		t.Run("search elastic", func(t *testing.T) {
 			redisRepoMock.EXPECT().IsExist(gomock.Any(), gomock.Any()).Return(false, nil).Times(1)
 
-			h := Handler{
-				ClientElastic:    ce.(pb.GatewayClient),
-				ClientAggregator: ca.(pb.AggregatorClient),
-				Log:              log,
-				RedisRepo:        redisRepoMock,
+			h := handler{
+				clientElastic:    ce.(pb.GatewayClient),
+				clientAggregator: ca.(pb.AggregatorClient),
+				log:              log,
+				redisRepo:        redisRepoMock,
 			}
 
 			_, err := h.SearchMovie(ctx, &pb.SearchMovieRequest{Query: "Harry Potter"})
@@ -199,11 +199,11 @@ func TestSearchMovie(t *testing.T) {
 		t.Run("search aggregator", func(t *testing.T) {
 			redisRepoMock.EXPECT().IsExist(gomock.Any(), gomock.Any()).Return(true, nil).Times(1)
 
-			h := Handler{
-				ClientElastic:    ce.(pb.GatewayClient),
-				ClientAggregator: ca.(pb.AggregatorClient),
-				Log:              log,
-				RedisRepo:        redisRepoMock,
+			h := handler{
+				clientElastic:    ce.(pb.GatewayClient),
+				clientAggregator: ca.(pb.AggregatorClient),
+				log:              log,
+				redisRepo:        redisRepoMock,
 			}
 
 			_, err := h.SearchMovie(ctx, &pb.SearchMovieRequest{Query: "Harry Potter"})
